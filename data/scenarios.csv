@@ -1,51 +1,50 @@
 lap_number,tyre_wear,weather,gap_to_car,optimal_action,difficulty,reason,edge_case
-1,10,clear,5.0,1,easy,Low wear early in race. Stay out.,False
-5,20,clear,3.0,1,easy,Healthy tyres. Stay out.,False
-10,30,clear,4.5,1,easy,Healthy tyres. Stay out.,False
-15,40,clear,2.0,1,easy,"Moderate wear, still safe. Stay out.",False
-20,50,clear,6.0,1,easy,Moderate wear. Stay out.,False
-22,65,clear,8.0,2,easy,Wear increasing. Space behind allows conserving without losing position.,False
-25,70,clear,15.0,2,easy,"Getting high on wear, large gap allows conserving avoiding late pit.",False
-28,75,clear,7.0,2,easy,"Nearing end of race, conserve to survive to lap 30.",False
-12,30,clear,1.5,3,easy,"Tyres are good, gap is close. Push to overtake or undercut.",False
-18,45,clear,0.8,3,easy,"Tyres are fine, very close to car ahead. Push hard.",False
-20,85,clear,4.0,0,easy,Tyre wear critical. Must pit to avoid failure.,False
-15,90,clear,2.5,0,easy,Severe premature wear. Required pit.,False
-29,98,clear,30.0,0,easy,"Tyres about to explode. Pit immediately, even on last lap.",True
-10,78,clear,2.0,0,easy,Borderline wear very early. Unsafe to continue. Pit.,True
-2,15,clear,0.2,3,easy,Extremely close gap early. Push to pass.,True
-24,55,clear,5.0,1,easy,"Normal wear, nearing end. Stay out.",False
-8,25,clear,12.0,1,easy,Cruising. Stay out.,False
-26,82,clear,1.0,0,easy,Wear too high to risk to the end. Pit.,False
-15,60,clear,20.0,2,easy,Decent wear but massive gap. Safely conserve tyres.,False
-19,35,clear,1.2,3,easy,"Good tyres, closing gap. Push.",False
-10,20,rain,5.0,4,medium,"Current tyres dry, weather rain. Must change strat.",False
-15,80,rain,2.0,4,medium,High wear and rain. Perfect time to pit and swap to wets.,False
-12,85,rain_soon,5.0,2,medium,High wear but rain is coming. Conserve to drag out current tyres until rain hits to avoid double pit.,False
-5,40,rain_soon,1.0,1,medium,"Tyres fine, gap tight. Stay out and wait for rain to pit.",False
-20,95,rain_soon,10.0,0,medium,"Rain coming, but tyres are dead. Forced to pit now.",True
-20,75,clear,0.5,3,medium,"Borderline wear, but gap is tiny. Push to try and overtake before pitting.",True
-28,82,clear,1.0,2,medium,"High wear, normally a pit. But gap is close and race is almost over. Risk conserving.",True
-22,78,clear,25.0,0,medium,"Borderline wear, huge gap behind. Safe pit window available. Pit.",True
-15,65,clear,0.8,3,medium,"Moderate wear, close gap. Push to attack.",False
-15,65,clear,15.0,2,medium,"Moderate wear, large gap. No need to push, conserve.",False
-10,75,rain_soon,0.5,2,medium,"Complex: Borderline wear, tight gap, rain imminent. Best to conserve and survive until rain hits to swap.",False
-28,50,rain,2.0,4,medium,Rain hit late in race. Must change to wets to avoid crashing off track.,False
-2,15,clear,2.0,3,medium,"Early race, good tyres, close target. Push.",False
-20,60,rain_soon,12.0,1,medium,"Tyres okay, large gap, rain coming. Stay out and hold position.",False
-8,90,rain,5.0,4,medium,High wear and rain. Immediate swap required.,False
-18,55,clear,4.0,1,medium,Middle of the road everything. Stay out.,False
-7,30,rain_soon,8.0,1,medium,"Good tyres, awaiting rain. Stay out.",False
-14,88,clear,5.0,0,medium,Too much wear. Pit.,False
-26,70,clear,3.0,2,medium,"Late race, wear getting high. Conserve to finish.",False
-5,10,rain,1.0,4,medium,Fresh dry tyres but it started raining. Must swap.,False
-16,81,rain_soon,20.0,2,medium,"High wear, but massive gap and rain coming. Conserve heavily to avoid two stops.",True
-9,25,clear,0.3,3,medium,"Very tight gap, good tyres. Maximum push.",False
-29,92,clear,1.0,0,medium,"Penultimate lap, close gap, but tyres critical. Must pit or DNF.",True
-12,40,rain,15.0,4,medium,"Raining. Irrelevant of gap, must swap tyres.",False
-24,74,clear,2.5,2,medium,Late race wear management.,False
-18,50,rain_soon,0.5,1,medium,"Tight battle, rain impending. Focus on staying out to swap on next lap.",False
-11,85,clear,0.5,0,medium,Very tight gap overcut attempt but wear is too high to pull it off. Must pit.,False
-17,68,clear,8.0,1,medium,Average situation. Stay out.,False
-21,45,clear,22.0,2,medium,"Solid lead, half wear. Safely conserve to finish.",False
-19,72,rain_soon,4.0,2,medium,"Borderline wear, waiting for rain. Conserve.",False
+1,10,clear,5.0,1,easy,"R7: wear<50, clear. Stay out.",False
+5,20,clear,3.0,1,easy,"R7: wear<50, clear. Stay out.",False
+10,30,clear,4.5,1,easy,"R7: wear<50, clear. Stay out.",False
+15,45,clear,2.5,1,easy,"R7: wear<50, gap>=2. Stay out.",False
+20,55,clear,6.0,1,easy,"R8: wear 50-60, clear. Stay out.",False
+24,58,clear,5.0,1,easy,"R8: wear 50-60, clear. Stay out.",False
+18,62,clear,8.0,2,easy,"R5: wear 60-85, gap>=5. Conserve.",False
+22,70,clear,15.0,2,easy,"R5: wear 60-85, gap>=5. Conserve.",False
+25,75,clear,7.0,2,easy,"R5: wear 60-85, gap>=5. Conserve.",False
+27,80,clear,20.0,2,easy,"R5: wear 60-85, gap>=5. Conserve.",False
+2,15,clear,0.2,3,easy,"R6: wear<50, gap<2. Push.",True
+12,30,clear,1.5,3,easy,"R6: wear<50, gap<2. Push.",False
+18,40,clear,0.8,3,easy,"R6: wear<50, gap<2. Push.",False
+19,48,clear,1.2,3,easy,"R6: wear<50, gap<2. Push.",False
+20,86,clear,4.0,0,easy,R2: wear>=86. Pit immediately.,False
+15,90,clear,2.5,0,easy,R2: wear>=86. Pit.,False
+26,95,clear,1.0,0,easy,R2: wear>=86. Pit despite close gap.,True
+29,98,clear,30.0,0,easy,R2: wear>=86. Emergency pit.,True
+10,88,clear,2.0,0,easy,R2: wear>=86. Unsafe. Pit.,True
+14,92,clear,5.0,0,easy,R2: wear>=86. Pit.,False
+5,10,rain,5.0,4,medium,R1: rain. Swap immediately.,False
+10,20,rain,2.0,4,medium,R1: rain. Swap.,False
+28,50,rain,2.0,4,medium,R1: rain. Must swap.,False
+15,80,rain,2.0,4,medium,R1: rain + high wear. Swap.,False
+8,90,rain,5.0,4,medium,R1: rain. Swap urgently.,False
+12,40,rain,15.0,4,medium,R1: rain. Gap irrelevant. Swap.,False
+20,95,rain_soon,10.0,0,medium,"R2 beats R3: wear>=86, pit now.",True
+29,92,rain_soon,1.0,0,medium,R2: wear>=86. Pit or DNF.,True
+14,88,clear,5.0,0,medium,R2: wear>=86. Pit.,False
+11,86,clear,0.5,0,medium,R2: wear>=86. Pit despite close gap.,True
+12,70,rain_soon,5.0,2,medium,"R3: rain_soon, wear>=70. Conserve.",False
+10,75,rain_soon,0.5,2,medium,"R3: rain_soon, wear>=70. Conserve.",True
+16,80,rain_soon,20.0,2,medium,"R3: rain_soon, wear>=70. Conserve.",True
+19,72,rain_soon,4.0,2,medium,"R3: rain_soon, wear>=70. Conserve.",False
+5,40,rain_soon,1.0,1,medium,"R4: rain_soon, wear<70. Stay out.",False
+7,30,rain_soon,8.0,1,medium,"R4: rain_soon, wear<70. Stay out.",False
+20,60,rain_soon,12.0,1,medium,"R4: rain_soon, wear<70. Stay out.",False
+18,50,rain_soon,0.5,1,medium,"R4: rain_soon, wear<70. Stay out.",False
+15,65,clear,15.0,2,medium,"R5: clear, wear 60-85, gap>=5. Conserve.",False
+26,70,clear,3.0,2,medium,"R5: late race, wear 60-85, gap>=5. Conserve.",False
+24,74,clear,2.5,2,medium,"R5: wear 60-85, gap>=5. Conserve.",False
+17,68,clear,8.0,2,medium,"R5: wear 60-85, gap>=5. Conserve.",False
+2,15,clear,2.0,3,medium,"R6: wear<50, gap<2. Push.",False
+9,25,clear,0.3,3,medium,"R6: wear<50, gap<2. Push hard.",False
+21,45,clear,1.0,3,medium,"R6: wear<50, gap<2. Push.",False
+18,55,clear,4.0,1,medium,"R8: wear 50-60, clear. Stay out.",False
+21,45,clear,22.0,1,medium,"R7: wear<50, large gap. Stay out.",False
+12,85,rain_soon,5.0,2,medium,"R3: wear>=70, rain_soon. Conserve not pit.",True
+25,85,rain,0.5,4,medium,R1: rain overrides everything. Swap.,True
