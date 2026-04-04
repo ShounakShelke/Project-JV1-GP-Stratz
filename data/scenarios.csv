@@ -1,50 +1,38 @@
-lap_number,tyre_wear,weather,gap_to_car,optimal_action,difficulty,reason,edge_case
-1,10,clear,5.0,1,easy,"R7: wear<50, clear. Stay out.",False
-5,20,clear,3.0,1,easy,"R7: wear<50, clear. Stay out.",False
-10,30,clear,4.5,1,easy,"R7: wear<50, clear. Stay out.",False
-15,45,clear,2.5,1,easy,"R7: wear<50, gap>=2. Stay out.",False
-20,55,clear,6.0,1,easy,"R8: wear 50-60, clear. Stay out.",False
-24,58,clear,5.0,1,easy,"R8: wear 50-60, clear. Stay out.",False
-18,62,clear,8.0,2,easy,"R5: wear 60-85, gap>=5. Conserve.",False
-22,70,clear,15.0,2,easy,"R5: wear 60-85, gap>=5. Conserve.",False
-25,75,clear,7.0,2,easy,"R5: wear 60-85, gap>=5. Conserve.",False
-27,80,clear,20.0,2,easy,"R5: wear 60-85, gap>=5. Conserve.",False
-2,15,clear,0.2,3,easy,"R6: wear<50, gap<2. Push.",True
-12,30,clear,1.5,3,easy,"R6: wear<50, gap<2. Push.",False
-18,40,clear,0.8,3,easy,"R6: wear<50, gap<2. Push.",False
-19,48,clear,1.2,3,easy,"R6: wear<50, gap<2. Push.",False
-20,86,clear,4.0,0,easy,R2: wear>=86. Pit immediately.,False
-15,90,clear,2.5,0,easy,R2: wear>=86. Pit.,False
-26,95,clear,1.0,0,easy,R2: wear>=86. Pit despite close gap.,True
-29,98,clear,30.0,0,easy,R2: wear>=86. Emergency pit.,True
-10,88,clear,2.0,0,easy,R2: wear>=86. Unsafe. Pit.,True
-14,92,clear,5.0,0,easy,R2: wear>=86. Pit.,False
-5,10,rain,5.0,4,medium,R1: rain. Swap immediately.,False
-10,20,rain,2.0,4,medium,R1: rain. Swap.,False
-28,50,rain,2.0,4,medium,R1: rain. Must swap.,False
-15,80,rain,2.0,4,medium,R1: rain + high wear. Swap.,False
-8,90,rain,5.0,4,medium,R1: rain. Swap urgently.,False
-12,40,rain,15.0,4,medium,R1: rain. Gap irrelevant. Swap.,False
-20,95,rain_soon,10.0,0,medium,"R2 beats R3: wear>=86, pit now.",True
-29,92,rain_soon,1.0,0,medium,R2: wear>=86. Pit or DNF.,True
-14,88,clear,5.0,0,medium,R2: wear>=86. Pit.,False
-11,86,clear,0.5,0,medium,R2: wear>=86. Pit despite close gap.,True
-12,70,rain_soon,5.0,2,medium,"R3: rain_soon, wear>=70. Conserve.",False
-10,75,rain_soon,0.5,2,medium,"R3: rain_soon, wear>=70. Conserve.",True
-16,80,rain_soon,20.0,2,medium,"R3: rain_soon, wear>=70. Conserve.",True
-19,72,rain_soon,4.0,2,medium,"R3: rain_soon, wear>=70. Conserve.",False
-5,40,rain_soon,1.0,1,medium,"R4: rain_soon, wear<70. Stay out.",False
-7,30,rain_soon,8.0,1,medium,"R4: rain_soon, wear<70. Stay out.",False
-20,60,rain_soon,12.0,1,medium,"R4: rain_soon, wear<70. Stay out.",False
-18,50,rain_soon,0.5,1,medium,"R4: rain_soon, wear<70. Stay out.",False
-15,65,clear,15.0,2,medium,"R5: clear, wear 60-85, gap>=5. Conserve.",False
-26,70,clear,3.0,2,medium,"R5: late race, wear 60-85, gap>=5. Conserve.",False
-24,74,clear,2.5,2,medium,"R5: wear 60-85, gap>=5. Conserve.",False
-17,68,clear,8.0,2,medium,"R5: wear 60-85, gap>=5. Conserve.",False
-2,15,clear,2.0,3,medium,"R6: wear<50, gap<2. Push.",False
-9,25,clear,0.3,3,medium,"R6: wear<50, gap<2. Push hard.",False
-21,45,clear,1.0,3,medium,"R6: wear<50, gap<2. Push.",False
-18,55,clear,4.0,1,medium,"R8: wear 50-60, clear. Stay out.",False
-21,45,clear,22.0,1,medium,"R7: wear<50, large gap. Stay out.",False
-12,85,rain_soon,5.0,2,medium,"R3: wear>=70, rain_soon. Conserve not pit.",True
-25,85,rain,0.5,4,medium,R1: rain overrides everything. Swap.,True
+lap,wear,weather,gap,safety_car,traffic,action,difficulty,reason
+1,10,clear,5.0,False,0,1,easy,"R10: low wear, cruising"
+8,25,clear,12.0,False,0,1,easy,R10: healthy tyres
+15,45,clear,3.0,False,0,1,easy,"R10: moderate wear, large gap → stay"
+20,55,clear,2.5,False,0,1,easy,"R10: wear 50-59, below conserve band"
+18,62,clear,8.0,False,0,2,easy,"R8: wear in 60-85, gap>=5, clear → conserve"
+25,75,clear,7.0,False,0,2,easy,"R8: wear in 60-85, gap>=5, clear → conserve"
+12,30,clear,1.5,False,0,3,easy,R9: fresh tyres + close rival → push
+18,40,clear,0.8,False,0,3,easy,R9: good tyres + attack position → push
+20,88,clear,4.0,False,0,0,easy,"R2: wear>=86, must pit"
+26,95,clear,1.0,False,0,0,easy,"R2: wear>=86, critical, pit now"
+10,20,rain,5.0,False,0,4,medium,"R1: rain, must swap"
+28,50,rain,2.0,False,0,4,medium,"R1: rain, mid-wear, swap"
+8,90,rain,5.0,False,0,4,medium,"R1: rain + high wear, swap urgently"
+14,88,clear,5.0,False,0,0,medium,"R2: wear>=86, pit"
+29,92,clear,1.0,False,0,0,medium,"R2: wear>=86, last lap, pit or DNF"
+19,72,rain_soon,4.0,False,0,2,medium,"R5: rain_soon+wear>=70, conserve to merge"
+16,80,rain_soon,20.0,False,0,2,medium,"R5: rain_soon+wear>=70, conserve"
+5,40,rain_soon,1.0,False,0,1,medium,"R6: rain_soon+wear<70, hold position"
+20,60,rain_soon,12.0,False,0,1,medium,"R6: rain_soon+wear<70, stay"
+10,38,clear,0.6,False,2,2,medium,"R7: high traffic stalemate, conserve"
+15,65,clear,15.0,False,0,2,medium,"R8: clear+60-85+gap>=5, conserve"
+24,74,clear,6.0,False,0,2,medium,"R8: clear+60-85+gap>=5, conserve"
+9,25,clear,0.3,False,0,3,medium,"R9: good tyres+tight gap, push"
+21,45,clear,1.5,False,1,3,medium,"R9: fresh+gap<2+traffic=med, push"
+18,50,clear,4.0,False,0,1,medium,"R10: wear at boundary, default stay"
+15,62,clear,5.0,True,0,0,hard,R3: SC active + wear>=55 → cheap pit
+16,2,clear,15.0,True,0,1,hard,"R4: SC still active, wear<55 (fresh), stay"
+17,7,clear,0.8,False,0,3,hard,"R9: SC ended, wear<50, gap(0.8)<2.0, traffic=0 → push"
+10,38,clear,0.6,False,2,2,hard,R7: high traffic stalemate → conserve
+11,41,clear,0.5,False,2,2,hard,R7: high traffic still → conserve
+12,44,clear,0.5,False,0,3,hard,"R9: traffic cleared, fresh tyres, gap<2 → push"
+22,70,clear,9.0,False,0,2,hard,"R8: wear in 60-85, gap>=5 → conserve"
+23,74,clear,9.5,False,0,2,hard,"R8: still 60-85, gap>=5 → conserve"
+24,92,clear,10.0,False,0,0,hard,"R2: wear(92)>=86, mandatory pit regardless of gap."
+18,72,rain_soon,6.0,False,0,2,hard,R5: rain_soon + wear>=70 → conserve to merge stop
+19,76,rain_soon,6.5,False,0,2,hard,R5: rain_soon + wear>=70 → conserve
+20,80,rain,7.0,False,0,4,hard,R1: rain arrived → swap to wets

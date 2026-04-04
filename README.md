@@ -11,82 +11,62 @@ In elite motorsport, victory isn't just about raw speed; it's about making criti
 ## Environment Overview
 GP-Stratz is built on the `OpenEnv` framework principles. It simulates a sequential multi-lap race where every action heavily influences the next state.
 *   **Time step:** 1 Step = 1 Lap.
-*   **Determinism:** Given a starting scenario seed, the environment returns identical states for identical agent actions.
-*   **Goal:** Reach the `done` state (completing the required number of laps) with the maximum cumulative reward (which translates to the shortest race time).
+*   **Determinism:** 100% deterministic. Given a starting scenario seed, the environment returns identical states for identical actions.
+*   **Tasks:** Supports three difficulty tiers (Easy, Medium, Hard).
 
 ---
 
 ## State Space
-The environment emits a simple but dense state vector (Max 5 variables) at the start of every lap:
+The environment emits a feature-rich state vector at the start of every lap:
 
 | Variable | Range | Description | Why it matters |
 | :--- | :--- | :--- | :--- |
-| `lap_number` | `0` to `max_laps` | The current position in the race. | Late-race decisions differ from early-race strategy. |
-| `tyre_wear` | `0` to `100` | Percentage of grip degradation. | >85% wear is dangerous. 100% is a DNF (crash). |
-| `weather` | `0` (Clear), `1` (Soon), `2` (Rain) | Impending or current rain. | Wet conditions require Wet tyres. |
-| `gap_to_car` | `float` (seconds) | Time gap to the nearest rival. | Smaller gaps require "Push" or "Undercut" tactics. |
-| `tyre_type` | `0` (Slicks), `1` (Wets)| Current equipment fitted. | Matching tyre type to weather is critical for base pace. |
+| `lap_number` | `1-30` | Current lap of the race. | Late-race decisions differ from early-race strategy. |
+| `tyre_wear` | `0-100` | Percentage of degradation. | >85% is critical. 100% results in DNF. |
+| `weather` | `0, 1, 2` | Clear, Soon, Rain. | Matching tyre type to weather is critical for pace. |
+| `gap_to_car` | `float` | Time gap to nearest rival. | Smaller gaps require "Push" or "Undercut" tactics. |
+| `safety_car` | `bool` | True/False. | **New (Task 3):** Reduces pit stop time loss by 50%. |
+| `traffic_level`| `0, 1, 2` | Low, Medium, High. | **New (Task 3):** High traffic blocks "Push" effectiveness. |
+| `tyre_deg_rate`| `0.8-1.5`| Degradation multiplier. | **New (Task 3):** Simulates varying track abrasiveness. |
 
 ---
 
 ## Action Space
-The agent chooses one of 5 discrete actions per step:
-
-| ID | Action | Effect | Ideal Use Case |
-| :--- | :--- | :--- | :--- |
-| **0** | **PIT** | +20s penalty. Resets wear to 0. | When tyres are critical (>85 wear). |
-| **1** | **STAY OUT** | Normal base lap time (e.g. 90s). +wear. | Standard racing state. Tyres are healthy. |
-| **2** | **CONSERVE**| +2s to lap time. Wear increases by 50% less. | Stretching a tyre stint to avoid an extra pit stop. |
-| **3** | **PUSH** | -2s from lap time. Wear increases by 2x. | Chasing a close rival to attempt an overtake. |
-| **4** | **SWAP STRAT**| +20s pit stop. Changes Slicks <-> Wets. | Mandatory when weather jumps between Clear and Rain. |
+0 = **PIT** (20s loss, 0% wear) | 1 = **STAY OUT** | 2 = **CONSERVE** (-wear) | 3 = **PUSH** (+wear, -time) | 4 = **SWAP** (Changes compound)
 
 ---
 
-## Reward Function (Trajectory Based)
-The reward system evaluates the *trajectory* of the race, punishing poor strategy and rewarding efficiency. It is **not** binary.
+## Reward Function (V3: Sequence Based)
+GP-Stratz uses a **Trajectory-Based Reward** system normalized to `[-2.0, +2.0]` per step.
 
-**Reward = `Target_Lap_Time` - `Actual_Lap_Time`**
-*(Higher reward = faster lap)*
-
-**Components that affect `Actual_Lap_Time`:**
-* **`+0.5` (Correct Decision Bonus):** e.g., Pushing successfully, or Swapping when Rain hits.
-* **`+0.2` (Tyre Management):** Conserving when needed.
-* **`-20.0` (Pit Stop):** Necessary evil, but costs time.
-* **`-5.0` (Wrong Tyres):** Driving slicks in the rain.
-* **`-500.0` (DNF Penalty):** Allowing `tyre_wear` to hit `100`. Terminates episode negatively.
+*   **Correctness (+1.0 / -1.0):** Dominant term based on scenario labels.
+*   **Strategy Bonus (+0.3 to +0.5):** Rewarded for specific high-IQ moves (e.g., Pitting under Safety Car, Conserving to wait for Rain).
+*   **Sequence Consistency (-0.3):** Penalty for erratic flipping between PUSH and CONSERVE in consecutive laps.
+*   **DNF Penalty (-2.0):** Immediate penalty if wear hits 100.
 
 ---
 
-## Task Descriptions (The Dataset)
+## Task Descriptions
 
-### Task 1 (Easy): Pit Timing Fundamentals
-*   **Focus:** Single-axis decision-making. 
-*   **Variables:** Only considers `lap_number` and `tyre_wear`. Weather is always clear.
-*   **Goal:** Teach the agent to pit before wear reaches 100, but not so early that they waste time.
-*   **Example State:** `{wear: 88, lap: 15, weather: clear}` -> **Action 0 (Pit)**.
+### Task 1 (Easy): Pit Timing
+Basic threshold detection. Pit when wear is critical.
 
 ### Task 2 (Medium): Multi-Factor Strategy
-*   **Focus:** Complex trade-offs, trajectory planning.
-*   **Variables:** Introduces dynamic `weather` and `gap_to_car`.
-*   **Goal:** Optimize decisions across laps. (e.g. Risking high tyre wear to survive until the rain arrives to save a double pit-stop).
-*   **Example State:** `{wear: 82, lap: 12, gap: 20.0, weather: rain_soon}` -> **Action 2 (Conserve)**.
+Incorporates weather and gaps. Identifying the "crossover" point for rain.
+
+### Task 3 (Hard): Multi-Step Strategic Simulation
+**Sequence-based logic.** Agent must navigate 3-5 lap windows containing Safety Cars and Traffic stalemates. Decisions in Lap 1 deeply affect the viability of the stint in Lap 5.
 
 ---
 
 ## File Structure
 ```text
-project-jv1/
-├── env/
-│   └── race_env.py      # Core OpenEnv class implementation (reset, step).
-├── data/
-│   └── generate_data.py # Script generating the deterministic dataset.
-│   └── scenarios.json   # (Created) Easy & Medium scenario state/action pairs.
-├── grader/
-│   └── evaluate.py      # Runner that pits an agent against the dataset.
-├── README.md            # Project documentation.
-├── requirements.txt     # Python dependencies.
-├── app.py               # (Optional) Interactive CLI runner.
-└── Dockerfile           # Standardized container logic for OpenEnv platform.
+project/
+├── env/                # RaceEnvironment engine
+├── data/               # Scenario generation & JSON datasets
+├── grader/             # Automated sequence-based evaluator
+├── app.py              # Manual testing CLI
+└── Dockerfile          # OpenEnv compliance
 ```
 
 ---
@@ -100,22 +80,15 @@ python -m venv venv
 venv\Scripts\activate
 # Linux/Mac:
 source venv/bin/activate
-
 pip install -r requirements.txt
 ```
 
 **2. Generate Dataset**
-*The dataset is deterministic and generated mathematically based on our rules engine.*
 ```bash
 python data/generate_data.py
 ```
 
-**3. Run the Environment (Manual Test)**
-```bash
-python app.py
-```
-
-**4. Evaluate Agent against Grader**
+**3. Run Multi-Step Evaluation**
 ```bash
 python grader/evaluate.py
 ```

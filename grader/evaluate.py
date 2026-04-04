@@ -3,84 +3,91 @@ import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from env.race_env import RaceEnvironment
 
-# ─────────────────────────────────────────────────────────────────────────────
-# WEATHER CONVERSION  (dataset strings → env int constants)
-# ─────────────────────────────────────────────────────────────────────────────
-WEATHER_MAP = {
-    "clear":     RaceEnvironment.WEATHER_CLEAR,
-    "rain_soon": RaceEnvironment.WEATHER_SOON,
-    "rain":      RaceEnvironment.WEATHER_RAIN,
-}
+WEATHER_MAP = {"clear": 0, "rain_soon": 1, "rain": 2}
 
-# ─────────────────────────────────────────────────────────────────────────────
-# BASELINE AGENT  —  strict rule hierarchy (mirrors generate_data.py rules)
-# ─────────────────────────────────────────────────────────────────────────────
-def choose_action(state):
-    """
-    Priority-ordered rule-based agent.
-    Rules are IDENTICAL to the golden rules in generate_data.py and race_env.py.
+# ═══════════════════════════════════════════════════════════════════
+#  GP-Stratz Baseline Agent  v4
+# ═══════════════════════════════════════════════════════════════════
+#  10 RULES — strictly ordered, mutually exclusive.
+#  Identical thresholds to env/race_env.py and data/generate_data.py
+#
+#  R1   weather==RAIN                           → SWAP
+#  R2   wear >= WEAR_CRITICAL (86)              → PIT
+#  R3   safety_car==True  AND  wear >= 55       → PIT     (cheap)
+#  R4   safety_car==True  AND  wear <  55       → STAY    (fresh, skip)
+#  R5   weather==RAIN_SOON  AND  wear >= 70     → CONSERVE
+#  R6   weather==RAIN_SOON  AND  wear <  70     → STAY
+#  R7   traffic==HIGH  AND  gap <= 1.0          → CONSERVE (stalemate)
+#  R8   clear + 60<=wear<=85 + gap>=5.0         → CONSERVE (stretch)
+#  R9   clear + wear<50 + gap<2.0 + traffic<2   → PUSH
+#  R10  default                                 → STAY
+# ═══════════════════════════════════════════════════════════════════
 
-    R1  weather == RAIN          → Swap (4)
-    R2  wear >= 86               → Pit  (0)
-    R3  rain_soon & wear >= 70   → Conserve (2)
-    R4  rain_soon & wear < 70    → Stay out (1)
-    R5  clear, wear 60-85, gap>=5→ Conserve (2)
-    R6  wear < 50, gap < 2       → Push (3)
-    R7  wear < 50                → Stay out (1)
-    R8  wear 50-60               → Stay out (1)
-    R9  fallback                 → Stay out (1)
-    """
+def baseline_agent(state):
     wear    = state["tyre_wear"]
-    weather = state["weather"]   # int constant
+    weather = state["weather"]     # int from env._obs()
     gap     = state["gap_to_car"]
+    sc      = state.get("safety_car", False)
+    traffic = state.get("traffic_level", 0)
 
-    # R1 – rain is mandatory swap
+    # R1 — Rain: swap immediately regardless of anything else
     if weather == RaceEnvironment.WEATHER_RAIN:
         return RaceEnvironment.ACTION_SWAP
 
-    # R2 – tyre failure imminent
-    if wear >= RaceEnvironment.WEAR_PIT_THRESHOLD:
+    # R2 — Critical wear: mandatory pit
+    if wear >= RaceEnvironment.WEAR_CRITICAL:
         return RaceEnvironment.ACTION_PIT
 
-    # R3 – rain coming, save tyres to merge with tyre-change stop
+    # R3 — Safety car + moderate+ wear: cheap pit window
+    if sc and wear >= RaceEnvironment.WEAR_SC_PIT:
+        return RaceEnvironment.ACTION_PIT
+
+    # R4 — Safety car + fresh tyres: no point pitting
+    if sc and wear < RaceEnvironment.WEAR_SC_PIT:
+        return RaceEnvironment.ACTION_STAY
+
+    # R5 — Rain coming + wear high: survive for wet swap stop
     if weather == RaceEnvironment.WEATHER_SOON and wear >= RaceEnvironment.WEAR_RAIN_SOON_CONSERVE:
         return RaceEnvironment.ACTION_CONSERVE
 
-    # R4 – rain coming but tyres are fine, just hold position
+    # R6 — Rain coming + wear low: just hold
     if weather == RaceEnvironment.WEATHER_SOON:
         return RaceEnvironment.ACTION_STAY
 
-    # R5 – clear weather, wear is moderate-high, big enough gap to slow down
-    if (RaceEnvironment.WEAR_CONSERVE_LOW <= wear <= RaceEnvironment.WEAR_CONSERVE_HIGH
-            and gap >= RaceEnvironment.GAP_CONSERVE_THRESHOLD):
+    # R7 — High traffic stalemate: can't pass, save rubber
+    if traffic == RaceEnvironment.TRAFFIC_HIGH and gap <= RaceEnvironment.GAP_PUSH:
         return RaceEnvironment.ACTION_CONSERVE
 
-    # R6 – fresh tyres and rival is right there
-    if wear < 50 and gap < RaceEnvironment.GAP_PUSH_THRESHOLD:
+    # R8 — Clear sky + moderate wear band + safe gap: stretch the stint
+    if (weather == RaceEnvironment.WEATHER_CLEAR
+            and RaceEnvironment.WEAR_CONSERVE_MIN <= wear <= RaceEnvironment.WEAR_CONSERVE_MAX
+            and gap >= RaceEnvironment.GAP_CONSERVE):
+        return RaceEnvironment.ACTION_CONSERVE
+
+    # R9 — Clear + fresh tyres + rival right there + not gridlocked
+    if (weather == RaceEnvironment.WEATHER_CLEAR
+            and wear < 50
+            and gap < RaceEnvironment.GAP_PUSH
+            and traffic < RaceEnvironment.TRAFFIC_HIGH):
         return RaceEnvironment.ACTION_PUSH
 
-    # R7 / R8 / R9 – safe to cruise
+    # R10 — Default: cruise
     return RaceEnvironment.ACTION_STAY
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# DATASET LOADER
-# ─────────────────────────────────────────────────────────────────────────────
+# ───────────────────────────────────────────────────────────────────
 def load_dataset(filepath="data/scenarios.json"):
     if not os.path.exists(filepath):
-        print(f"[ERROR] Dataset not found at '{filepath}'.")
+        print(f"[ERROR] Dataset not found at '{filepath}'")
         print("Run:  python data/generate_data.py")
         return []
-    with open(filepath, "r") as f:
+    with open(filepath) as f:
         return json.load(f)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# EVALUATION LOOP
-# ─────────────────────────────────────────────────────────────────────────────
+# ───────────────────────────────────────────────────────────────────
 def run_evaluation():
     dataset = load_dataset()
     if not dataset:
@@ -89,66 +96,98 @@ def run_evaluation():
     env = RaceEnvironment(max_laps=30)
 
     total_reward  = 0.0
-    max_reward    = 0.0   # best-case = every action correct (+1.0 correctness + max bonus)
+    max_reward    = 0.0
     matches       = 0
+    task_scores   = {"easy":[0.0,0], "medium":[0.0,0], "hard":[0.0,0]}
     pass_rewards  = []
     fail_rewards  = []
 
-    print(f"GP-Stratz Evaluation  |  {len(dataset)} scenarios")
-    print("=" * 55)
+    print(f"GP-Stratz Evaluation v4  |  {len(dataset)} scenarios")
+    print("=" * 60)
+
+    current_seq  = None
 
     for i, scenario in enumerate(dataset):
-        s      = scenario["state"]
-        opt    = scenario["optimal_action"]
-        diff   = scenario["difficulty"].upper()
+        s    = scenario["state"]
+        opt  = scenario["optimal_action"]
+        diff = scenario["difficulty"]
+        meta = scenario.get("metadata", {})
+        seq  = meta.get("sequence_id")
 
-        # Reset env to exactly the scenario starting state
-        state = env.reset({
-            "lap":       s["lap_number"],
-            "wear":      s["tyre_wear"],
-            "weather":   WEATHER_MAP[s["weather"]],
-            "gap":       s["gap_to_car"],
-            "tyre_type": RaceEnvironment.TYRE_SLICKS,   # default
-        })
+        # ── State initialisation ──────────────────────────────
+        # Design principle: the dataset encodes the EXACT ground-truth
+        # state at every step (including wear & gap). We always load it
+        # fully. For Hard sequences this means the dataset pre-computes
+        # the expected wear after each action, which keeps every step's
+        # decision boundary crisp and unambiguous.
+        if diff == "hard" and seq == current_seq:
+            # Sequence continuation: update ALL state vars from dataset.
+            # This ensures the agent sees the intended state at each step,
+            # not a drift from the env's own physics approximation.
+            env.lap        = s["lap_number"]
+            env.wear       = float(s["tyre_wear"])
+            env.weather    = WEATHER_MAP.get(s["weather"], 0)
+            env.gap        = float(s["gap_to_car"])
+            env.safety_car = bool(s.get("safety_car", False))
+            env.traffic    = s.get("traffic_level", 0)
+            state = env._obs()
+        else:
+            current_seq = seq
+            state = env.reset({
+                "lap":        s["lap_number"],
+                "wear":       s["tyre_wear"],
+                "weather":    WEATHER_MAP.get(s["weather"], 0),
+                "gap":        s["gap_to_car"],
+                "safety_car": bool(s.get("safety_car", False)),
+                "traffic":    s.get("traffic_level", 0),
+                "tyre_type":  0,
+            })
 
-        # Agent decision (rule-based baseline)
-        agent_action = choose_action(state)
+        # ── Agent decision ────────────────────────────────────
+        action = baseline_agent(state)
 
-        # Step the environment WITH the optimal label so reward aligns
-        _, reward, _, info = env.step(agent_action, optimal_action=opt)
+        # ── Step env (pass label so reward aligns) ────────────
+        _, reward, _, info = env.step(action, optimal_action=opt)
 
+        # ── Bookkeeping ───────────────────────────────────────
         total_reward += reward
-        max_reward   += 1.5            # correctness(1.0) + max bonus(0.5)
+        max_reward   += 1.6     # correctness(1.2) + max forward_bonus(0.4)
+        task_scores[diff][0] += reward
+        task_scores[diff][1] += 1
 
-        if agent_action == opt:
+        if action == opt:
             matches += 1
-            status   = "PASS"
+            status = "PASS"
             pass_rewards.append(reward)
         else:
-            status = f"FAIL (want {opt}, got {agent_action})"
+            status = f"FAIL (want {opt}, got {action})"
             fail_rewards.append(reward)
 
-        print(f"  #{i+1:02d} [{diff:6s}] {status:<28} reward={reward:+.3f}")
+        print(f"  #{i+1:02d} [{diff:6s}] {status:<30} reward={reward:+.3f}")
 
-    # ── Summary ──────────────────────────────────────────────
-    accuracy       = (matches / len(dataset)) * 100
-    norm_score     = total_reward / max_reward if max_reward else 0.0
-    avg_pass_r     = sum(pass_rewards) / len(pass_rewards)   if pass_rewards else 0
-    avg_fail_r     = sum(fail_rewards) / len(fail_rewards)   if fail_rewards else 0
+    # ── Summary ───────────────────────────────────────────────
+    accuracy   = matches / len(dataset) * 100
+    norm_score = total_reward / max_reward if max_reward else 0.0
+    avg_pass   = sum(pass_rewards) / len(pass_rewards) if pass_rewards else 0
+    avg_fail   = sum(fail_rewards) / len(fail_rewards) if fail_rewards else 0
 
-    print("\n" + "=" * 55)
-    print("EVALUATION COMPLETE")
-    print(f"  Accuracy        : {accuracy:.1f}%  ({matches}/{len(dataset)})")
-    print(f"  Total Reward    : {total_reward:.2f}")
-    print(f"  Normalised Score: {norm_score:.3f}   (range 0.0 – 1.0)")
-    print(f"  Avg PASS reward : {avg_pass_r:+.3f}")
-    print(f"  Avg FAIL reward : {avg_fail_r:+.3f}")
-    print("=" * 55)
+    print("\n" + "=" * 60)
+    print("GP-STRATZ FINAL RESULTS")
+    print("=" * 60)
+    print(f"  Global Accuracy   : {accuracy:.1f}%  ({matches}/{len(dataset)})")
+    print(f"  Normalised Score  : {norm_score:.3f}   (0.0–1.0 scale)")
+    print(f"  Avg PASS reward   : {avg_pass:+.3f}")
+    print(f"  Avg FAIL reward   : {avg_fail:+.3f}")
+    print()
+    print("  Task breakdown:")
+    for t, (r, c) in task_scores.items():
+        print(f"    {t.upper():8s}: avg reward = {r/c:+.3f}  ({c} steps)")
+    print("=" * 60)
 
-    if avg_pass_r > avg_fail_r:
-        print("[OK] PASS rewards are consistently higher than FAIL rewards.")
+    if avg_pass > avg_fail:
+        print("[OK] PASS rewards consistently higher than FAIL rewards.")
     else:
-        print("[WARN] Reward alignment issue detected — review env.step().")
+        print("[WARN] Alignment issue — review env.step() reward design.")
 
 
 if __name__ == "__main__":
