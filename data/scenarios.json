@@ -1,0 +1,702 @@
+[
+    {
+        "state": {
+            "lap_number": 1,
+            "tyre_wear": 10,
+            "weather": "clear",
+            "gap_to_car": 5.0
+        },
+        "optimal_action": 1,
+        "difficulty": "easy",
+        "metadata": {
+            "reason": "Low wear early in race. Stay out.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 5,
+            "tyre_wear": 20,
+            "weather": "clear",
+            "gap_to_car": 3.0
+        },
+        "optimal_action": 1,
+        "difficulty": "easy",
+        "metadata": {
+            "reason": "Healthy tyres. Stay out.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 10,
+            "tyre_wear": 30,
+            "weather": "clear",
+            "gap_to_car": 4.5
+        },
+        "optimal_action": 1,
+        "difficulty": "easy",
+        "metadata": {
+            "reason": "Healthy tyres. Stay out.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 15,
+            "tyre_wear": 40,
+            "weather": "clear",
+            "gap_to_car": 2.0
+        },
+        "optimal_action": 1,
+        "difficulty": "easy",
+        "metadata": {
+            "reason": "Moderate wear, still safe. Stay out.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 20,
+            "tyre_wear": 50,
+            "weather": "clear",
+            "gap_to_car": 6.0
+        },
+        "optimal_action": 1,
+        "difficulty": "easy",
+        "metadata": {
+            "reason": "Moderate wear. Stay out.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 22,
+            "tyre_wear": 65,
+            "weather": "clear",
+            "gap_to_car": 8.0
+        },
+        "optimal_action": 2,
+        "difficulty": "easy",
+        "metadata": {
+            "reason": "Wear increasing. Space behind allows conserving without losing position.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 25,
+            "tyre_wear": 70,
+            "weather": "clear",
+            "gap_to_car": 15.0
+        },
+        "optimal_action": 2,
+        "difficulty": "easy",
+        "metadata": {
+            "reason": "Getting high on wear, large gap allows conserving avoiding late pit.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 28,
+            "tyre_wear": 75,
+            "weather": "clear",
+            "gap_to_car": 7.0
+        },
+        "optimal_action": 2,
+        "difficulty": "easy",
+        "metadata": {
+            "reason": "Nearing end of race, conserve to survive to lap 30.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 12,
+            "tyre_wear": 30,
+            "weather": "clear",
+            "gap_to_car": 1.5
+        },
+        "optimal_action": 3,
+        "difficulty": "easy",
+        "metadata": {
+            "reason": "Tyres are good, gap is close. Push to overtake or undercut.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 18,
+            "tyre_wear": 45,
+            "weather": "clear",
+            "gap_to_car": 0.8
+        },
+        "optimal_action": 3,
+        "difficulty": "easy",
+        "metadata": {
+            "reason": "Tyres are fine, very close to car ahead. Push hard.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 20,
+            "tyre_wear": 85,
+            "weather": "clear",
+            "gap_to_car": 4.0
+        },
+        "optimal_action": 0,
+        "difficulty": "easy",
+        "metadata": {
+            "reason": "Tyre wear critical. Must pit to avoid failure.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 15,
+            "tyre_wear": 90,
+            "weather": "clear",
+            "gap_to_car": 2.5
+        },
+        "optimal_action": 0,
+        "difficulty": "easy",
+        "metadata": {
+            "reason": "Severe premature wear. Required pit.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 29,
+            "tyre_wear": 98,
+            "weather": "clear",
+            "gap_to_car": 30.0
+        },
+        "optimal_action": 0,
+        "difficulty": "easy",
+        "metadata": {
+            "reason": "Tyres about to explode. Pit immediately, even on last lap.",
+            "edge_case": true
+        }
+    },
+    {
+        "state": {
+            "lap_number": 10,
+            "tyre_wear": 78,
+            "weather": "clear",
+            "gap_to_car": 2.0
+        },
+        "optimal_action": 0,
+        "difficulty": "easy",
+        "metadata": {
+            "reason": "Borderline wear very early. Unsafe to continue. Pit.",
+            "edge_case": true
+        }
+    },
+    {
+        "state": {
+            "lap_number": 2,
+            "tyre_wear": 15,
+            "weather": "clear",
+            "gap_to_car": 0.2
+        },
+        "optimal_action": 3,
+        "difficulty": "easy",
+        "metadata": {
+            "reason": "Extremely close gap early. Push to pass.",
+            "edge_case": true
+        }
+    },
+    {
+        "state": {
+            "lap_number": 24,
+            "tyre_wear": 55,
+            "weather": "clear",
+            "gap_to_car": 5.0
+        },
+        "optimal_action": 1,
+        "difficulty": "easy",
+        "metadata": {
+            "reason": "Normal wear, nearing end. Stay out.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 8,
+            "tyre_wear": 25,
+            "weather": "clear",
+            "gap_to_car": 12.0
+        },
+        "optimal_action": 1,
+        "difficulty": "easy",
+        "metadata": {
+            "reason": "Cruising. Stay out.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 26,
+            "tyre_wear": 82,
+            "weather": "clear",
+            "gap_to_car": 1.0
+        },
+        "optimal_action": 0,
+        "difficulty": "easy",
+        "metadata": {
+            "reason": "Wear too high to risk to the end. Pit.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 15,
+            "tyre_wear": 60,
+            "weather": "clear",
+            "gap_to_car": 20.0
+        },
+        "optimal_action": 2,
+        "difficulty": "easy",
+        "metadata": {
+            "reason": "Decent wear but massive gap. Safely conserve tyres.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 19,
+            "tyre_wear": 35,
+            "weather": "clear",
+            "gap_to_car": 1.2
+        },
+        "optimal_action": 3,
+        "difficulty": "easy",
+        "metadata": {
+            "reason": "Good tyres, closing gap. Push.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 10,
+            "tyre_wear": 20,
+            "weather": "rain",
+            "gap_to_car": 5.0
+        },
+        "optimal_action": 4,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Current tyres dry, weather rain. Must change strat.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 15,
+            "tyre_wear": 80,
+            "weather": "rain",
+            "gap_to_car": 2.0
+        },
+        "optimal_action": 4,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "High wear and rain. Perfect time to pit and swap to wets.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 12,
+            "tyre_wear": 85,
+            "weather": "rain_soon",
+            "gap_to_car": 5.0
+        },
+        "optimal_action": 2,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "High wear but rain is coming. Conserve to drag out current tyres until rain hits to avoid double pit.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 5,
+            "tyre_wear": 40,
+            "weather": "rain_soon",
+            "gap_to_car": 1.0
+        },
+        "optimal_action": 1,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Tyres fine, gap tight. Stay out and wait for rain to pit.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 20,
+            "tyre_wear": 95,
+            "weather": "rain_soon",
+            "gap_to_car": 10.0
+        },
+        "optimal_action": 0,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Rain coming, but tyres are dead. Forced to pit now.",
+            "edge_case": true
+        }
+    },
+    {
+        "state": {
+            "lap_number": 20,
+            "tyre_wear": 75,
+            "weather": "clear",
+            "gap_to_car": 0.5
+        },
+        "optimal_action": 3,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Borderline wear, but gap is tiny. Push to try and overtake before pitting.",
+            "edge_case": true
+        }
+    },
+    {
+        "state": {
+            "lap_number": 28,
+            "tyre_wear": 82,
+            "weather": "clear",
+            "gap_to_car": 1.0
+        },
+        "optimal_action": 2,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "High wear, normally a pit. But gap is close and race is almost over. Risk conserving.",
+            "edge_case": true
+        }
+    },
+    {
+        "state": {
+            "lap_number": 22,
+            "tyre_wear": 78,
+            "weather": "clear",
+            "gap_to_car": 25.0
+        },
+        "optimal_action": 0,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Borderline wear, huge gap behind. Safe pit window available. Pit.",
+            "edge_case": true
+        }
+    },
+    {
+        "state": {
+            "lap_number": 15,
+            "tyre_wear": 65,
+            "weather": "clear",
+            "gap_to_car": 0.8
+        },
+        "optimal_action": 3,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Moderate wear, close gap. Push to attack.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 15,
+            "tyre_wear": 65,
+            "weather": "clear",
+            "gap_to_car": 15.0
+        },
+        "optimal_action": 2,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Moderate wear, large gap. No need to push, conserve.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 10,
+            "tyre_wear": 75,
+            "weather": "rain_soon",
+            "gap_to_car": 0.5
+        },
+        "optimal_action": 2,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Complex: Borderline wear, tight gap, rain imminent. Best to conserve and survive until rain hits to swap.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 28,
+            "tyre_wear": 50,
+            "weather": "rain",
+            "gap_to_car": 2.0
+        },
+        "optimal_action": 4,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Rain hit late in race. Must change to wets to avoid crashing off track.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 2,
+            "tyre_wear": 15,
+            "weather": "clear",
+            "gap_to_car": 2.0
+        },
+        "optimal_action": 3,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Early race, good tyres, close target. Push.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 20,
+            "tyre_wear": 60,
+            "weather": "rain_soon",
+            "gap_to_car": 12.0
+        },
+        "optimal_action": 1,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Tyres okay, large gap, rain coming. Stay out and hold position.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 8,
+            "tyre_wear": 90,
+            "weather": "rain",
+            "gap_to_car": 5.0
+        },
+        "optimal_action": 4,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "High wear and rain. Immediate swap required.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 18,
+            "tyre_wear": 55,
+            "weather": "clear",
+            "gap_to_car": 4.0
+        },
+        "optimal_action": 1,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Middle of the road everything. Stay out.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 7,
+            "tyre_wear": 30,
+            "weather": "rain_soon",
+            "gap_to_car": 8.0
+        },
+        "optimal_action": 1,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Good tyres, awaiting rain. Stay out.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 14,
+            "tyre_wear": 88,
+            "weather": "clear",
+            "gap_to_car": 5.0
+        },
+        "optimal_action": 0,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Too much wear. Pit.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 26,
+            "tyre_wear": 70,
+            "weather": "clear",
+            "gap_to_car": 3.0
+        },
+        "optimal_action": 2,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Late race, wear getting high. Conserve to finish.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 5,
+            "tyre_wear": 10,
+            "weather": "rain",
+            "gap_to_car": 1.0
+        },
+        "optimal_action": 4,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Fresh dry tyres but it started raining. Must swap.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 16,
+            "tyre_wear": 81,
+            "weather": "rain_soon",
+            "gap_to_car": 20.0
+        },
+        "optimal_action": 2,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "High wear, but massive gap and rain coming. Conserve heavily to avoid two stops.",
+            "edge_case": true
+        }
+    },
+    {
+        "state": {
+            "lap_number": 9,
+            "tyre_wear": 25,
+            "weather": "clear",
+            "gap_to_car": 0.3
+        },
+        "optimal_action": 3,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Very tight gap, good tyres. Maximum push.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 29,
+            "tyre_wear": 92,
+            "weather": "clear",
+            "gap_to_car": 1.0
+        },
+        "optimal_action": 0,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Penultimate lap, close gap, but tyres critical. Must pit or DNF.",
+            "edge_case": true
+        }
+    },
+    {
+        "state": {
+            "lap_number": 12,
+            "tyre_wear": 40,
+            "weather": "rain",
+            "gap_to_car": 15.0
+        },
+        "optimal_action": 4,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Raining. Irrelevant of gap, must swap tyres.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 24,
+            "tyre_wear": 74,
+            "weather": "clear",
+            "gap_to_car": 2.5
+        },
+        "optimal_action": 2,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Late race wear management.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 18,
+            "tyre_wear": 50,
+            "weather": "rain_soon",
+            "gap_to_car": 0.5
+        },
+        "optimal_action": 1,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Tight battle, rain impending. Focus on staying out to swap on next lap.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 11,
+            "tyre_wear": 85,
+            "weather": "clear",
+            "gap_to_car": 0.5
+        },
+        "optimal_action": 0,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Very tight gap overcut attempt but wear is too high to pull it off. Must pit.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 17,
+            "tyre_wear": 68,
+            "weather": "clear",
+            "gap_to_car": 8.0
+        },
+        "optimal_action": 1,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Average situation. Stay out.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 21,
+            "tyre_wear": 45,
+            "weather": "clear",
+            "gap_to_car": 22.0
+        },
+        "optimal_action": 2,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Solid lead, half wear. Safely conserve to finish.",
+            "edge_case": false
+        }
+    },
+    {
+        "state": {
+            "lap_number": 19,
+            "tyre_wear": 72,
+            "weather": "rain_soon",
+            "gap_to_car": 4.0
+        },
+        "optimal_action": 2,
+        "difficulty": "medium",
+        "metadata": {
+            "reason": "Borderline wear, waiting for rain. Conserve.",
+            "edge_case": false
+        }
+    }
+]
