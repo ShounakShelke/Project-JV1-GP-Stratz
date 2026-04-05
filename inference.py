@@ -40,7 +40,6 @@ def run_inference():
     if api_key:
         client_args["api_key"] = api_key
     else:
-        # Fallback dummy key to prevent client crash if testing locally against a local proxy
         client_args["api_key"] = "dummy"
 
     client = OpenAI(**client_args)
@@ -57,13 +56,13 @@ def run_inference():
     error_msg = None
     success = False
     
-    # Start line
-    print(f'{{"type": "start", "env": "{env_name}", "model": "{model_name}", "task": "{task_name}"}}', flush=True)
+    # [START] line - REQUIRED FORMAT
+    start_info = {"env": env_name, "model": model_name, "task": task_name}
+    print(f'[START] {json.dumps(start_info)}', flush=True)
     
     try:
         while not env.done:
             step_number += 1
-            
             prompt = f"Current state: {json.dumps(state)}"
             
             try:
@@ -77,27 +76,28 @@ def run_inference():
                     max_tokens=10
                 )
                 output = response.choices[0].message.content.strip()
-                
-                # Parse action safely
                 try:
                     action = int(output)
                     if action not in [0, 1, 2, 3, 4]:
-                        action = 1 # Fallback to STAY
-                except ValueError:
-                    action = 1 # Fallback
-            except Exception as e:
-                action = 1 # Default conservative fallback
-                # We could record error, but we want to finish the episode
+                        action = 1
+                except (ValueError, TypeError):
+                    action = 1 
+            except Exception:
+                action = 1 
             
             # Step the environment
-            next_state, reward, done, info = env.step(action)
+            next_state, raw_reward, done, info = env.step(action)
+            total_score += raw_reward
+            reward_list.append(round(raw_reward, 4))
             
-            total_score += reward
-            reward_list.append(round(reward, 2))
-            
-            # Step line
-            done_str = "true" if done else "false"
-            print(f'{{"type": "step", "step": {step_number}, "action": {action}, "reward": {reward:.2f}, "done": {done_str}}}', flush=True)
+            # [STEP] line - REQUIRED FORMAT
+            step_info = {
+                "step": step_number, 
+                "action": action, 
+                "reward": round(raw_reward, 4), 
+                "done": done
+            }
+            print(f'[STEP] {json.dumps(step_info)}', flush=True)
             
             state = next_state
 
@@ -106,10 +106,17 @@ def run_inference():
         error_msg = str(e)
         success = False
     finally:
-        success_str = "true" if success else "false"
-        error_val = json.dumps(error_msg) if error_msg else "null"
-        # End line
-        print(f'{{"type": "end", "task": "{task_name}", "env": "{env_name}", "model": "{model_name}", "score": {total_score:.2f}, "success": {success_str}, "error": {error_val}, "reward_list": {reward_list}}}', flush=True)
+        # [END] line - REQUIRED FORMAT
+        end_info = {
+            "task": task_name,
+            "env": env_name,
+            "model": model_name,
+            "score": round(total_score, 4),
+            "success": success,
+            "error": error_msg,
+            "reward_list": reward_list
+        }
+        print(f'[END] {json.dumps(end_info)}', flush=True)
 
 if __name__ == "__main__":
     run_inference()

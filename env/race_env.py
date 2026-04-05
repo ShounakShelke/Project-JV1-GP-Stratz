@@ -2,7 +2,12 @@ class RaceEnvironment:
     """
     GP-Stratz Motorsport Strategy Environment  v4
     ─────────────────────────────────────────────
-    Reward structure (clamped to [-2.0, +2.0]):
+    Reward structure (scaled to [0.0, 1.0]):
+      Perfect (raw +2.0) -> 1.0
+      Neutral (raw 0.0)  -> 0.5
+      Fail    (raw -2.0) -> 0.0
+      
+    Components (Raw):
       correctness   1.2 * (±1)    dominant correctness term
       forward_bonus up to +0.4    for provably smart moves
       seq_bonus     +0.3          consistent 3+ lap strategy
@@ -75,7 +80,7 @@ class RaceEnvironment:
     # ──────────────────────────────────────────────────────────
     def step(self, action, optimal_action=None):
         if self.done:
-            return self._obs(), 0.0, True, {"msg": "Episode already finished."}
+            return self._obs(), 0.5, True, {"msg": "Episode already finished."}
 
         self.steps_in_ep += 1
         self.action_history.append(action)
@@ -139,7 +144,7 @@ class RaceEnvironment:
         # ── DNF check ──────────────────────────────────────────
         if self.wear >= 100.0:
             self.done = True
-            return self._obs(), -2.0, True, {"msg": "DNF: tyre failure"}
+            return self._obs(), 0.0, True, {"msg": "DNF: tyre failure"}
 
         # ── Advance lap ────────────────────────────────────────
         self.lap += 1
@@ -171,9 +176,12 @@ class RaceEnvironment:
                   and last3[-1] != last3[-2]):
                 seq_bonus = -0.3
 
-        # ── Compose & clamp ────────────────────────────────────
+        # ── Compose & scale to [0.0, 1.0] ──────────────────────
         raw = correctness + forward_bonus + mismatch_penalty + seq_bonus
-        reward = max(-2.0, min(2.0, round(raw, 3)))
+        clamped_raw = max(-2.0, min(2.0, round(raw, 3)))
+        
+        # Linear shift: -2.0 -> 0.0, 0.0 -> 0.5, 2.0 -> 1.0
+        scaled_reward = round((clamped_raw + 2.0) / 4.0, 4)
 
         info = {
             "reward_breakdown": {
@@ -181,8 +189,9 @@ class RaceEnvironment:
                 "forward_bonus":  round(forward_bonus, 3),
                 "mismatch":       round(mismatch_penalty, 3),
                 "seq_bonus":      round(seq_bonus, 3),
-                "raw":            round(raw, 3),
-                "clamped":        reward,
+                "raw_total":      round(raw, 3),
+                "clamped_raw":    clamped_raw,
+                "scaled_final":   scaled_reward
             }
         }
-        return self._obs(), reward, self.done, info
+        return self._obs(), scaled_reward, self.done, info

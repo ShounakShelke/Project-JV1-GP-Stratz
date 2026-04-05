@@ -1,3 +1,12 @@
+---
+title: GP-Stratz
+emoji: 🏎️
+colorFrom: red
+colorTo: gray
+sdk: docker
+app_port: 8000
+---
+
 # GP-Stratz: Motorsport Strategy Environment
 **An OpenEnv Hackathon Submission**
 
