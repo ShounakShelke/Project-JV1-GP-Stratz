@@ -26,9 +26,9 @@ def get_system_prompt():
 
 def run_inference():
     # Load Environment variables
-    api_key = os.environ.get("HF_TOKEN") or os.environ.get("API_KEY")
-    base_url = os.environ.get("API_BASE_URL")
-    model_name = os.environ.get("MODEL_NAME", "gpt-4o-mini")
+    api_key = os.getenv("HF_TOKEN")
+    base_url = os.getenv("API_BASE_URL", "https://api-inference.huggingface.co/v1")
+    model_name = os.getenv("MODEL_NAME", "gpt-4o-mini")
     
     if os.environ.get("LOCAL_IMAGE_NAME"):
         model_name = os.environ.get("LOCAL_IMAGE_NAME")
