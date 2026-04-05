@@ -1,0 +1,14 @@
+name: GP-Stratz
+version: 1.0.1
+description: A deterministic motorsport strategy environment where an AI agent manages tyre wear, pit stops, and weather conditions to extract maximum performance.
+tags:
+  - openenv
+  - simulation
+  - motorsport
+  - hackathon
+environment:
+  action_space: Discrete(5)
+  observation_space: Dict
+entrypoint:
+  command: "python app.py"
+  port: 8000

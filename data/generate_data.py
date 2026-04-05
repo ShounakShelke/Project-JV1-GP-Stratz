@@ -193,7 +193,7 @@ for a, name in action_names.items():
 
 # ── Export ─────────────────────────────────────────────────────
 os.makedirs("data", exist_ok=True)
-with open("data/scenarios.json", "w") as f:
+with open("data/dataset.json", "w") as f:
     json.dump(dataset, f, indent=4)
 
 flat = [{
@@ -205,4 +205,4 @@ flat = [{
 } for d in dataset]
 pd.DataFrame(flat).to_csv("data/scenarios.csv", index=False)
 pd.DataFrame(flat).to_excel("data/scenarios.xlsx", index=False)
-print("Exported: scenarios.json / .csv / .xlsx")
+print("Exported: dataset.json / .csv / .xlsx")

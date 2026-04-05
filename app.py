@@ -1,44 +1,46 @@
+import os
+import sys
+
+# Ensure current directory is in path for 'env' etc.
+project_root = os.path.dirname(os.path.abspath(__file__))
+if project_root not in sys.path:
+    sys.path.append(project_root)
+
+import uvicorn
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 from env.race_env import RaceEnvironment
 
-def run_simulation():
-    print("--- GP Stratz Manual Env Test ---")
-    env = RaceEnvironment(max_laps=5)
-    
-    # Custom initial state
-    initial_state = {
-        "lap": 1,
-        "wear": 80.0,
-        "weather": RaceEnvironment.WEATHER_CLEAR,
-        "gap": 10.0,
-        "tyre_type": RaceEnvironment.TYRE_SLICKS
+app = FastAPI(title="GP-Stratz Environment")
+env = RaceEnvironment(max_laps=30)
+
+class ActionRequest(BaseModel):
+    action: int
+
+@app.post("/reset")
+def reset_env():
+    state = env.reset()
+    return {"state": state}
+
+@app.post("/step")
+def step_env(req: ActionRequest):
+    if env.done:
+        raise HTTPException(status_code=400, detail="Episode already finished. Call /reset")
+    next_state, reward, done, info = env.step(req.action)
+    return {
+        "state": next_state,
+        "reward": reward,
+        "done": done,
+        "info": info
     }
-    
-    state = env.reset(initial_state)
-    print(f"Start State: {state}")
-    
-    # We will simulate 5 steps.
-    actions = [
-        RaceEnvironment.ACTION_STAY,   # Lap 1: Stay out (dangerously high wear)
-        RaceEnvironment.ACTION_PIT,    # Lap 2: Pit (Wear was probably too high)
-        RaceEnvironment.ACTION_PUSH,   # Lap 3: Push on fresh tyres
-        RaceEnvironment.ACTION_CONSERVE, # Lap 4: Conserve
-        RaceEnvironment.ACTION_STAY    # Lap 5: Stay Out
-    ]
-    
-    for i, action in enumerate(actions):
-        print(f"\n--- Lap {state['lap_number']} ---")
-        print(f"Agent Action: {action}")
-        
-        next_state, reward, done, info = env.step(action)
-        
-        print(f"Resulting State: {next_state}")
-        print(f"Reward: {reward}")
-        print(f"Info Breakdown: {info}")
-        
-        state = next_state
-        if done:
-            print("\n>>> EPISODE DONE <<<")
-            break
+
+@app.get("/state")
+def get_state():
+    return {"state": env.state()}
+
+def main():
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
 
 if __name__ == "__main__":
-    run_simulation()
+    main()

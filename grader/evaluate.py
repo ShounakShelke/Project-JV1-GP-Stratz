@@ -78,7 +78,7 @@ def baseline_agent(state):
 
 
 # ───────────────────────────────────────────────────────────────────
-def load_dataset(filepath="data/scenarios.json"):
+def load_dataset(filepath="data/dataset.json"):
     if not os.path.exists(filepath):
         print(f"[ERROR] Dataset not found at '{filepath}'")
         print("Run:  python data/generate_data.py")

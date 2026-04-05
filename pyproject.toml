@@ -1,0 +1,16 @@
+[project]
+name = "GP-Stratz"
+version = "1.0.0"
+description = "GP-Stratz Motorsport Strategy Environment"
+dependencies = [
+    "openenv-core",
+    "openai",
+    "pydantic",
+    "fastapi",
+    "uvicorn",
+    "pandas>=2.2.0",
+    "openpyxl>=3.1.2"
+]
+
+[project.scripts]
+server = "app:main"

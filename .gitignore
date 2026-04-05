@@ -1,21 +1,11 @@
-# Environments
 venv/
-.env
-env/
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-
-# Editor and IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Docker
-.dockerignore
-
-# OS specific files
-.DS_Store
-Thumbs.db
+others/temp/
+*.log
+val*.txt
+validation_result.txt
+clean.txt
+.gemini/
+.claude/
+.codex/
