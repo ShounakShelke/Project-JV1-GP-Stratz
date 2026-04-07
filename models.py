@@ -34,7 +34,7 @@ class StateResponse(BaseModel):
 class BenchmarkResponse(BaseModel):
     env: str = "GP-Stratz"
     accuracy: str
-    normalized_score: float
+    score: float
     tasks: Dict[str, float]
     status: str
     note: str

@@ -2,8 +2,8 @@ import os
 import json
 import textwrap
 from openai import OpenAI
-
 from env.race_env import RaceEnvironment
+from grader.evaluate import load_dataset, normalize_score, WEATHER_MAP
 
 def get_system_prompt():
     return textwrap.dedent("""\
@@ -24,8 +24,31 @@ def get_system_prompt():
         Output ONLY the numeric action (0, 1, 2, 3, or 4). Do not provide any explanation.
     """)
 
+def get_llm_action(client, model_name, state):
+    prompt = f"Current state: {json.dumps(state)}"
+    try:
+        response = client.chat.completions.create(
+            model=model_name,
+            messages=[
+                {"role": "system", "content": get_system_prompt()},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.0,
+            max_tokens=10
+        )
+        output = response.choices[0].message.content.strip()
+        try:
+            action = int(output)
+            if action not in [0, 1, 2, 3, 4]:
+                return 1
+            return action
+        except (ValueError, TypeError):
+            return 1
+    except Exception:
+        return 1
+
 def run_inference():
-    # Load Environment variables
+    # Environment variables
     api_key = os.getenv("HF_TOKEN")
     base_url = os.getenv("API_BASE_URL", "https://api-inference.huggingface.co/v1")
     model_name = os.getenv("MODEL_NAME", "gpt-4o-mini")
@@ -33,90 +56,99 @@ def run_inference():
     if os.environ.get("LOCAL_IMAGE_NAME"):
         model_name = os.environ.get("LOCAL_IMAGE_NAME")
 
-    # Configure OpenAI Client
-    client_args = {}
+    # OpenAI Client
+    client_args = {"api_key": api_key if api_key else "dummy"}
     if base_url:
         client_args["base_url"] = base_url
-    if api_key:
-        client_args["api_key"] = api_key
-    else:
-        client_args["api_key"] = "dummy"
-
     client = OpenAI(**client_args)
 
-    # Initialize environment
+    # Initialize environment and dataset
+    dataset = load_dataset()
+    if not dataset:
+        print('[ERROR] No dataset found.')
+        return
+
     env = RaceEnvironment(max_laps=30)
-    state = env.reset()
     
-    task_name = "GP-Stratz-Benchmark"
-    env_name = "GP-Stratz"
-    step_number = 0
-    reward_list = []
-    total_score = 0.0
-    error_msg = None
-    success = False
+    # 3 Task Logic
+    task_stats = {
+        "easy":   {"reward": 0.0, "max": 0.0},
+        "medium": {"reward": 0.0, "max": 0.0},
+        "hard":   {"reward": 0.0, "max": 0.0}
+    }
     
-    # [START] line - REQUIRED FORMAT
-    start_info = {"env": env_name, "model": model_name, "task": task_name}
+    # [START] - REQUIRED FORMAT
+    start_info = {"env": "GP-Stratz", "model": model_name, "task": "GP-Stratz-Benchmark"}
     print(f'[START] {json.dumps(start_info)}', flush=True)
     
-    try:
-        while not env.done:
-            step_number += 1
-            prompt = f"Current state: {json.dumps(state)}"
-            
-            try:
-                response = client.chat.completions.create(
-                    model=model_name,
-                    messages=[
-                        {"role": "system", "content": get_system_prompt()},
-                        {"role": "user", "content": prompt}
-                    ],
-                    temperature=0.0,
-                    max_tokens=10
-                )
-                output = response.choices[0].message.content.strip()
-                try:
-                    action = int(output)
-                    if action not in [0, 1, 2, 3, 4]:
-                        action = 1
-                except (ValueError, TypeError):
-                    action = 1 
-            except Exception:
-                action = 1 
-            
-            # Step the environment
-            next_state, raw_reward, done, info = env.step(action)
-            total_score += raw_reward
-            reward_list.append(round(raw_reward, 4))
-            
-            # [STEP] line - REQUIRED FORMAT
-            step_info = {
-                "step": step_number, 
-                "action": action, 
-                "reward": round(raw_reward, 4), 
-                "done": done
-            }
-            print(f'[STEP] {json.dumps(step_info)}', flush=True)
-            
-            state = next_state
+    step_number = 0
+    current_seq = None
 
-        success = True
-    except Exception as e:
-        error_msg = str(e)
-        success = False
-    finally:
-        # [END] line - REQUIRED FORMAT
-        end_info = {
-            "task": task_name,
-            "env": env_name,
-            "model": model_name,
-            "score": round(total_score, 4),
-            "success": success,
-            "error": error_msg,
-            "reward_list": reward_list
+    for scenario in dataset:
+        diff = scenario["difficulty"]
+        s    = scenario["state"]
+        opt  = scenario["optimal_action"]
+        meta = scenario.get("metadata", {})
+        seq  = meta.get("sequence_id")
+
+        # Sync environment state
+        if diff == "hard" and seq == current_seq:
+            env.lap        = s["lap_number"]
+            env.wear       = float(s["tyre_wear"])
+            env.weather    = WEATHER_MAP.get(s["weather"], 0)
+            env.gap        = float(s["gap_to_car"])
+            env.safety_car = bool(s.get("safety_car", False))
+            env.traffic    = s.get("traffic_level", 0)
+            state = env._obs()
+        else:
+            current_seq = seq
+            state = env.reset({
+                "lap":        s["lap_number"],
+                "wear":       s["tyre_wear"],
+                "weather":    WEATHER_MAP.get(s["weather"], 0),
+                "gap":        s["gap_to_car"],
+                "safety_car": bool(s.get("safety_car", False)),
+                "traffic":    s.get("traffic_level", 0),
+                "tyre_type":  0,
+            })
+
+        # Get LLM action
+        action = get_llm_action(client, model_name, state)
+        
+        # Step env
+        _, reward, done, _ = env.step(action, optimal_action=opt)
+        
+        # Update metrics
+        task_stats[diff]["reward"] += reward
+        task_stats[diff]["max"] += 1.0
+        step_number += 1
+        
+        # [STEP] - REQUIRED FORMAT
+        step_info = {
+            "step":   step_number,
+            "action": action,
+            "reward": round(reward, 4),
+            "done":   done
         }
-        print(f'[END] {json.dumps(end_info)}', flush=True)
+        print(f'[STEP] {json.dumps(step_info)}', flush=True)
+
+    # Compile Final Tasks scores
+    easy_score   = normalize_score(task_stats["easy"]["reward"] / task_stats["easy"]["max"])
+    medium_score = normalize_score(task_stats["medium"]["reward"] / task_stats["medium"]["max"])
+    hard_score   = normalize_score(task_stats["hard"]["reward"] / task_stats["hard"]["max"])
+    
+    overall_score = normalize_score((easy_score + medium_score + hard_score) / 3.0)
+
+    # [END] - UPDATED Phase 2 FORMAT
+    end_info = {
+        "score": overall_score,
+        "tasks": {
+            "easy":   easy_score,
+            "medium": medium_score,
+            "hard":   hard_score
+        }
+    }
+    print(f'[END] {json.dumps(end_info)}', flush=True)
 
 if __name__ == "__main__":
     run_inference()
