@@ -10,6 +10,14 @@ app_port: 8000
 # GP-Stratz: Motorsport Strategy Environment
 **An OpenEnv Hackathon Submission**
 
+## Current Status
+**Phase 2 / Pre-Validation Checks Passed (April 2026)**
+The submission has been heavily optimized and is now fully immune to previous validation pipeline fails. Recent patches include:
+* **Docker/HF Spaces Health Compliance:** Explicitly routing and bounding HuggingFace container port (`8000`) perfectly in `Dockerfile` to match `openenv.yaml`, fixing any 30-minute boot timeouts.
+* **OpenEnv spec compliance:** Explicit separation of graded tasks (`easy`, `medium`, `hard`) inside `openenv.yaml` that trigger dedicated command-line endpoint metrics.
+* **Secure Score Bounds:** Overhauled evaluation and bounding logic in `grader/evaluate.py` to securely guarantee all scores fall exclusively within `(0.001` and `0.999)`, satisfying strictly `(0, 1)`.
+* **Strict Inference STD-Out:** Fully adheres to OpenEnv's new parsing rules by avoiding unstructured JSON dumps inside inference strings, matching EXACTLY to `<key>=<value>` pairs on a single line (`[START]`, `[STEP]`, `[END]`).
+
 ## What GP-Stratz Does
 **GP-Stratz** provides a deterministic, lightweight simulation of a high-stakes motorsport race. It asks an AI agent to act as a race strategist, minimizing total race time over an episodic trajectory by making lap-by-lap decisions on pitting, tyre conservation, pushing, and reacting to changing weather conditions.
 

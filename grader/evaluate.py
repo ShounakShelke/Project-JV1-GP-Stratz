@@ -42,9 +42,10 @@ def baseline_agent(state):
 
 def normalize_score(score):
     """Ensures score is strictly (0, 1)."""
-    if score >= 1.0: return 0.999
-    if score <= 0.0: return 0.001
-    return round(float(score), 4)
+    score = float(score)
+    if score >= 0.999: return 0.999
+    if score <= 0.001: return 0.001
+    return round(score, 4)
 
 def evaluate_task(difficulty, dataset, agent_fn=None):
     if agent_fn is None:
@@ -115,6 +116,7 @@ def load_dataset(filepath="data/dataset.json"):
 def run_evaluation():
     dataset = load_dataset()
     if not dataset:
+        print("0.001")
         return {"error": "no data"}
     
     e = evaluate_easy(dataset)
@@ -122,9 +124,21 @@ def run_evaluation():
     h = evaluate_hard(dataset)
     ov = normalize_score((e + m + h) / 3.0)
     
+    if len(sys.argv) > 1:
+        task = sys.argv[1]
+        if task == "easy":
+            score = e
+        elif task == "medium":
+            score = m
+        elif task == "hard":
+            score = h
+        else:
+            score = ov
+        print(score)
+        return score
+        
     res = {"score": ov, "tasks": {"easy": e, "medium": m, "hard": h}}
-    if __name__ == "__main__":
-        print(json.dumps(res, indent=2))
+    print(json.dumps(res, indent=2))
     return res
 
 if __name__ == "__main__":

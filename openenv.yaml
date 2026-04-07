@@ -12,3 +12,10 @@ environment:
 entrypoint:
   command: "python app.py"
   port: 8000
+tasks:
+  - id: easy
+    grader: "python grader/evaluate.py easy"
+  - id: medium
+    grader: "python grader/evaluate.py medium"
+  - id: hard
+    grader: "python grader/evaluate.py hard"

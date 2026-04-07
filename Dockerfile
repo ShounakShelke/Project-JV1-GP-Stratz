@@ -1,18 +1,22 @@
-FROM python:3.10-slim
+FROM python:3.10
 
 ENV ENABLE_WEB_INTERFACE=true
 ENV PORT=8000
 
-WORKDIR /app
+# Set up a non-root user (required by Hugging Face Spaces)
+RUN useradd -m -u 1000 user
+USER user
 
-# Copy requirement list
-COPY requirements.txt .
+ENV HOME=/home/user \
+    PATH=/home/user/.local/bin:$PATH
 
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt uv
+WORKDIR $HOME/app
 
-# Copy all local project files to container
-COPY . .
+COPY --chown=user requirements.txt .
+RUN pip install --no-cache-dir --user -r requirements.txt
 
-# Run the app from root
+COPY --chown=user . .
+
+EXPOSE 8000
+
 CMD ["python", "app.py"]

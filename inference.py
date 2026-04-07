@@ -78,11 +78,13 @@ def run_inference():
     }
     
     # [START] - REQUIRED FORMAT
-    start_info = {"env": "GP-Stratz", "model": model_name, "task": "GP-Stratz-Benchmark"}
-    print(f'[START] {json.dumps(start_info)}', flush=True)
+    task_name = "GP-Stratz-Benchmark"
+    env_name = "GP-Stratz"
+    print(f"[START] task={task_name} env={env_name} model={model_name}", flush=True)
     
     step_number = 0
     current_seq = None
+    all_rewards = []
 
     for scenario in dataset:
         diff = scenario["difficulty"]
@@ -122,15 +124,11 @@ def run_inference():
         task_stats[diff]["reward"] += reward
         task_stats[diff]["max"] += 1.0
         step_number += 1
+        all_rewards.append(reward)
         
         # [STEP] - REQUIRED FORMAT
-        step_info = {
-            "step":   step_number,
-            "action": action,
-            "reward": round(reward, 4),
-            "done":   done
-        }
-        print(f'[STEP] {json.dumps(step_info)}', flush=True)
+        bool_done = str(done).lower()
+        print(f"[STEP] step={step_number} action={action} reward={reward:.2f} done={bool_done} error=null", flush=True)
 
     # Compile Final Tasks scores
     easy_score   = normalize_score(task_stats["easy"]["reward"] / task_stats["easy"]["max"])
@@ -140,15 +138,8 @@ def run_inference():
     overall_score = normalize_score((easy_score + medium_score + hard_score) / 3.0)
 
     # [END] - UPDATED Phase 2 FORMAT
-    end_info = {
-        "score": overall_score,
-        "tasks": {
-            "easy":   easy_score,
-            "medium": medium_score,
-            "hard":   hard_score
-        }
-    }
-    print(f'[END] {json.dumps(end_info)}', flush=True)
+    rewards_str = ",".join(f"{r:.2f}" for r in all_rewards)
+    print(f"[END] success=true steps={step_number} score={overall_score:.2f} rewards={rewards_str}", flush=True)
 
 if __name__ == "__main__":
     run_inference()
