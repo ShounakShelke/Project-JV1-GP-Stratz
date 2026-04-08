@@ -1,1 +1,1 @@
-# empty file
+from .app import app

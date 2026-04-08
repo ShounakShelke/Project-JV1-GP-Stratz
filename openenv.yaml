@@ -1,30 +1,12 @@
-spec_version: 1
 name: gp-stratz
 version: 1.0.0
-type: space
-runtime: fastapi
+
 entrypoint: server.app:app
-port: 8000
-description: >
-  A deterministic motorsport strategy environment where an AI agent manages
-  tyre wear, pit stops, and weather conditions to extract maximum performance.
 
 tasks:
-  - id: task_1
-    name: "Task 1 (Easy)"
-    description: "Single-step optimal decisions for motorsport strategy"
-    grader: "deterministic"
-    enabled: true
-    active: true
-  - id: task_2
-    name: "Task 2 (Medium)"
-    description: "Contextual decisions involving Safety Cars, weather, and traffic"
-    grader: "deterministic"
-    enabled: true
-    active: true
-  - id: task_3
-    name: "Task 3 (Hard)"
-    description: "Multi-step sequential strategies across 3-5 consecutive laps"
-    grader: "deterministic"
-    enabled: true
-    active: true
+  - id: easy
+    grader: deterministic
+  - id: medium
+    grader: deterministic
+  - id: hard
+    grader: deterministic

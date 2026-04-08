@@ -12,5 +12,6 @@ COPY --chown=user requirements.txt .
 RUN pip install --no-cache-dir --user -r requirements.txt
 COPY --chown=user . .
 
-EXPOSE 8000
+EXPOSE 7860
 CMD ["python", "app.py"]
+
