@@ -1,8 +1,9 @@
 spec_version: 1
-name: GP-Stratz
+name: gp-stratz
+version: 1.0.0
 type: space
 runtime: fastapi
-app: server.app:app
+entrypoint: server.app:app
 port: 8000
 description: >
   A deterministic motorsport strategy environment where an AI agent manages
