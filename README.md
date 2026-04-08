@@ -56,15 +56,40 @@ The reward engine is normalized to `[-2.0, +2.0]` with four key components:
 3.  **Sequence Consistency (+0.3)**: Reward for maintaining strategy over 3 consecutive laps.
 4.  **Inconsistency Penalty (-0.3)**: Punishes erratic "flip-flopping" between PUSH and CONSERVE.
 
-## Tasks
-*   **Task 1 (Easy)**: Single-step optimal decisions (e.g., matching tyre type to weather, pitting when critically worn).
-*   **Task 2 (Medium)**: Contextual decisions (e.g., holding out for expected rain, capitalizing on Safety Cars, managing traffic).
+## Tasks and Grading System
+
+GP-Stratz features 3 explicit tasks for evaluation, each with its own dedicated grading logic:
+
+*   **Task 1 (Easy)**: Single-step optimal decisions (e.g., matching tyre type to weather, pitting when critically worn). Validates the agent's fundamental awareness of race rules.
+*   **Task 2 (Medium)**: Contextual decisions (e.g., holding out for expected rain, capitalizing on Safety Cars, managing traffic). Validates the agent's ability to handle multi-factor environmental variables.
 *   **Task 3 (Hard)**: Multi-step sequential strategies. The agent must successfully navigate a 3-5 lap continuous sequence, such as a managed undercut attempt without burning out the tyres.
 
-## Baseline Score Details
-*   **Accuracy**: 100.0% (37/37 Scenarios correctly identified by Baseline Expert Agent).
-*   **Normalized Score**: > 0.84 (Scale 0.0 - 1.0).
-*   **Reward Alignment**: Verified (PASS rewards consistently > FAIL rewards).
+### Grading Logic
+
+The system uses a strict deterministic grading pipeline:
+1.  **Independent Scoring**: Each task (Easy, Medium, Hard) is evaluated independently against its respective Scenario subsets in the dataset.
+2.  **Normalization**: Every individual task score is strictly normalized to be between `(0, 1)` using the following guarantee:
+    *   If `score >= 1.0`, it is capped at `0.999`.
+    *   If `score <= 0.0`, it is floored at `0.001`.
+    *   This ensures no boundary values (0.0 or 1.0) interfere with the validator.
+3.  **Final Aggregation**: The final overall score is calculated as the simple average of the three task scores:
+    `final_score = (easy_score + medium_score + hard_score) / 3`
+    The final score is also normalized to stay within the strict `(0, 1)` range.
+
+### Sample Output Format
+
+The `inference.py` script and the `/benchmark` endpoint return a structured JSON block in the `[END]` tag:
+
+```json
+[END] {
+  "score": 0.82,
+  "tasks": {
+    "easy": 0.84,
+    "medium": 0.80,
+    "hard": 0.76
+  }
+}
+```
 
 ## File Structure
 ```text
