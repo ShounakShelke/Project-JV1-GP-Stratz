@@ -1,8 +1,6 @@
 name: gp-stratz
 version: 1.0.0
 
-entrypoint: server.app:app
-
 tasks:
   - id: easy
     grader: deterministic
