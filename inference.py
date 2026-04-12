@@ -6,7 +6,7 @@ from openai import OpenAI
 
 API_BASE_URL = os.environ["API_BASE_URL"].rstrip("/")
 API_KEY = os.environ["API_KEY"]
-MODEL_NAME = os.environ["MODEL_NAME"]
+MODEL_NAME = os.environ.get("MODEL_NAME") or os.environ.get("OPENAI_MODEL") or "gpt-4o-mini"
 
 client = OpenAI(
     base_url=API_BASE_URL,
