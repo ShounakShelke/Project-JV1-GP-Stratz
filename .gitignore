@@ -10,3 +10,5 @@ clean.txt
 .claude/
 .codex/
 .others
+pdf_pages/
+inference_dry_run_check.py

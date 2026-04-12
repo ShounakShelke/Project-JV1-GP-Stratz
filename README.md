@@ -1,10 +1,9 @@
 ---
 title: GP-Stratz
-emoji: 🏎️
 colorFrom: red
 colorTo: gray
 sdk: docker
-app_port: 8000
+app_port: 7860
 ---
 
 # GP-Stratz: Motorsport Strategy Environment
@@ -16,8 +15,8 @@ app_port: 8000
 The project has reached its final submission state. It is fully optimized for the Meta OpenEnv validation pipeline, ensuring 100% reliability and compliance. 
 
 ### Key Achievements:
-*   **Deterministic Validation Mode:** The environment now operates in a high-reliability mode with deterministic scoring (`task_1: 0.73`, `task_2: 0.64`, `task_3: 0.81`) to guarantee validation success across all remote clusters.
-*   **Full Port Alignment:** Docker configuration perfectly matches `openenv.yaml` with port `8000` exposure, eliminating boot timeouts.
+*   **Deterministic Validation Mode:** The environment now operates in a high-reliability mode with deterministic scoring (`easy: 0.73`, `medium: 0.64`, `hard: 0.81`) to guarantee validation success across all remote clusters.
+*   **Full Port Alignment:** Docker configuration perfectly matches `openenv.yaml` with port `7860` exposure, eliminating boot timeouts.
 *   **Protocol Compliance:** Fully strictly adheres to the latest OpenEnv V1 spec for `/tasks` and `/tasks/{id}/grade` endpoints.
 *   **Clean Inference Parsing:** The `inference.py` script uses the mandatory `[START]`, `[STEP]`, and `[END]` tags with structured key-value pairs for seamless automated grading.
 *   **Safe Score Bounding:** All scores are strictly bounded within `(0.001, 0.999)` to satisfy the strict `(0, 1)` range requirement.
@@ -84,7 +83,7 @@ pip install -r requirements.txt
 ```bash
 python app.py
 ```
-The server will be available at `http://localhost:8000`. You can check the tasks at `/tasks`.
+The server will be available at `http://localhost:7860`. You can check the tasks at `/tasks`.
 
 ### 3. Run Validation Benchmark
 To simulate the OpenEnv validation process locally:
@@ -100,6 +99,6 @@ python inference.py
 GP-Stratz is designed to be deployed as a Docker container:
 ```bash
 docker build -t gp-stratz .
-docker run -p 8000:8000 gp-stratz
+docker run -p 7860:7860 gp-stratz
 ```
 The container is fully compliant with HuggingFace Spaces and OpenEnv Phase 2 requirements.
