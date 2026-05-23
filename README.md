@@ -1,137 +1,178 @@
 ---
 title: GP-Stratz
-colorFrom: red
-colorTo: gray
+colorFrom: indigo
+colorTo: purple
 sdk: docker
 app_port: 7860
 tags:
   - openenv
 ---
 
-# GP-Stratz
+<div align="center">
 
-An OpenEnv hackathon submission for deterministic motorsport strategy evaluation.
+# 🏎️ GP-Stratz — Motorsport Strategy RL Environment
 
-## Current Status
+**Project JV1** · Built by [Shounak Shelke](https://github.com/ShounakShelke) · *Inspired by James Vowles, Race Engineer & Team Principal, Williams F1*
 
-Final stabilized submission candidate as of April 12, 2026.
+[![Live on HF Spaces](https://img.shields.io/badge/🤗%20HuggingFace-Live%20Demo-yellow?style=for-the-badge)](https://huggingface.co/spaces/shounak17/GP-Stratz)
+[![OpenEnv](https://img.shields.io/badge/OpenEnv-Hackathon%20Submission-blue?style=for-the-badge)](https://huggingface.co/spaces/shounak17/GP-Stratz)
+[![License](https://img.shields.io/badge/License-Apache%202.0-green?style=for-the-badge)](LICENSE)
 
-The repository is aligned around the validator-safe `easy`, `medium`, and `hard` task system, strict proxy-based inference setup, and minimal OpenEnv-compatible runtime endpoints.
+*"Overconfident? Penalised. Tactical management? Rewarded."*
 
-### Validation Snapshot
+</div>
 
-- `openenv validate .` passes locally.
-- Runtime OpenEnv URL validation passes against the local FastAPI server.
-- `/tasks`, `/tasks/{task_id}/grade`, `/reset`, and `/step` return the expected minimal payloads.
-- `inference.py` emits `[START]`, three `[STEP]`, and `[END]` with deterministic scores.
-- The baseline script makes an OpenAI `responses.create(...)` call using `API_BASE_URL`, `API_KEY`, and `MODEL_NAME` before printing logs.
+---
 
-## Environment Description
+## 🖥️ Live Dashboard
 
-GP-Stratz models race-strategy decision making for a Formula-style motorsport scenario. The agent is evaluated on whether it can respond correctly to changing race context such as tyre wear, weather shifts, safety car periods, and traffic.
+> **Fully deployed on Hugging Face Spaces** — Interactive F1 Strategy Simulator with real-time telemetry, multi-agent episodes, and a live leaderboard matrix.
 
-The current submission keeps the evaluation surface deterministic so the hackathon validator can reliably detect tasks, graders, and baseline outputs without regressions.
+### Hero — The AI That Masters F1 Strategy
 
-## Observation Space
+![Dashboard Hero — Live Telemetry & Terminal](assets/screenshot_hero.png)
 
-The environment concept uses the following state variables:
+### Reward Timeline & Leaderboard Matrix
 
-| Variable | Description |
-| :-- | :-- |
-| `lap_number` | Current lap in the race. |
-| `tyre_wear` | Current tyre degradation level. |
-| `weather` | Encoded weather state. |
-| `gap_to_car` | Time gap to the nearest rival. |
-| `safety_car` | Whether a safety car is active. |
-| `traffic_level` | Relative traffic intensity around the car. |
+![Reward Timeline & Leaderboard Matrix](assets/screenshot_dashboard.png)
 
-The runtime schema endpoint also exposes OpenEnv-compatible `action`, `observation`, and `state` schema objects.
+---
 
-## Action Space
+## ✅ Current Status
 
-The strategy action space is documented as:
+**🟢 Fully Live — Multi-Agent Simulation Deployed**
 
-1. `PIT`: pit for fresh tyres.
-2. `STAY`: continue at standard pace.
-3. `CONSERVE`: save tyres and reduce degradation.
-4. `PUSH`: maximize pace at the cost of wear.
-5. `SWAP`: change tyre type for weather conditions.
+The environment is fully operational on HF Spaces. All hardcoded stubs have been replaced by a live deterministic grader that dynamically evaluates AI agents across 30-lap race episodes.
 
-## Tasks
+### Agent Leaderboard (Latest Results)
 
-The validator-facing task IDs are:
+| Agent | Easy | Medium | Hard |
+|:------|:----:|:------:|:----:|
+| EasyRuleAgent | **0.885** | 0.534 | 0.693 |
+| MediumAgent | **0.885** | **0.882** | **0.866** |
+| HardMultiFactorAgent | **0.885** | **0.882** | **0.866** |
+| ConservativeAgent | 0.364 | 0.220 | 0.613 |
+| AggressiveAgent | 0.474 | 0.338 | 0.347 |
 
-1. `easy`: basic race-rule and condition handling.
-2. `medium`: stronger context awareness such as safety-car timing.
-3. `hard`: multi-factor strategic optimization.
+> 🏆 **MediumAgent** and **HardMultiFactorAgent** are the top performers — near-perfect on Easy, strong and consistent across Medium and Hard phases.
 
-These exact names are used consistently in:
+### Key Accomplishments
 
-- `openenv.yaml`
-- `GET /tasks`
-- `GET /tasks/{task_id}/grade`
-- `inference.py`
+- ✅ **5 Specialised Agents** — `EasyRuleAgent`, `MediumAgent`, `HardMultiFactorAgent`, `ConservativeAgent`, `AggressiveAgent`
+- ✅ **Dynamic Grading Pipeline** — `phase_grader.py` deterministically simulates full 30-lap episodes, scoring via a 4-metric reward breakdown: *Correctness, Forward Bonus, Mismatch Penalty, Sequence Consistency*
+- ✅ **Interactive F1 Dashboard** — Dark-mode UI with live telemetry, animated tyre wear bars, per-lap reward timeline chart, and a cross-phase leaderboard matrix
+- ✅ **Real-time Terminal Log** — macOS-style terminal renders live race engineer decisions lap-by-lap
+- ✅ **OpenEnv Compliant** — All required runtime endpoints implemented: `/reset`, `/step`, `/tasks`, `/tasks/{id}/grade`, `/schema`
+- ✅ **Docker Deployed** — Running via Uvicorn on HF Spaces port 7860
 
-## Grading and Baseline Scores
+---
 
-The public deterministic grader outputs are:
+## 🏁 Environment Description
 
-- `easy` -> `0.73`
-- `medium` -> `0.64`
-- `hard` -> `0.81`
+GP-Stratz models race-strategy decision making for a Formula-style motorsport scenario. The agent must respond correctly to dynamic race context — tyre wear, weather shifts, safety car periods, and traffic — to maximise cumulative reward over a 30-lap episode.
 
-All published scores are strictly between `0` and `1`.
+### Observation Space
 
-## API Surface
+| Variable | Type | Description |
+|:---------|:----:|:------------|
+| `lap_number` | `int` | Current lap in the race (1–30) |
+| `tyre_wear` | `float` | Current tyre degradation level (0–100%) |
+| `weather` | `int` | Encoded weather state (0=Clear, 1=Rain) |
+| `gap_to_car` | `float` | Time gap to nearest rival (seconds) |
+| `safety_car` | `bool` | Whether a safety car is active |
+| `traffic_level` | `int` | Relative traffic intensity around the car |
+| `tyre_deg_rate` | `float` | Current degradation rate per lap |
+| `tyre_type` | `int` | Active tyre compound |
 
-Main endpoints:
+### Action Space
 
-- `GET /` -> service message
-- `GET /tasks` -> task list with `id`, `task_id`, and `grader`
-- `GET /tasks/{task_id}/grade` -> deterministic task score
-- `POST /reset` -> clean reset payload
-- `POST /step` -> deterministic terminal step payload
+| ID | Action | Description |
+|:--:|:------:|:------------|
+| 0 | `PIT` | Pit stop — fresh tyres, tyre wear resets |
+| 1 | `STAY` | Continue at standard pace |
+| 2 | `CONSERVE` | Save tyres, reduce degradation, lose time |
+| 3 | `PUSH` | Maximise pace at the cost of tyre wear |
+| 4 | `SWAP` | Change tyre compound (weather strategy) |
 
-Runtime compatibility endpoints:
+---
 
-- `GET /health`
-- `GET /metadata`
-- `GET /schema`
-- `GET /state`
-- `POST /mcp`
+## 🎯 Tasks & Phases
 
-## Project Structure
+| Phase | ID | Difficulty | Extra Conditions |
+|:------|:--:|:----------:|:-----------------|
+| Easy | `easy` | ⭐ | Basic tyre wear & weather handling |
+| Medium | `medium` | ⭐⭐ | + Safety car timing & traffic management |
+| Hard | `hard` | ⭐⭐⭐ | Multi-factor strategic optimisation |
+
+---
+
+## 🔌 API Surface
+
+| Method | Endpoint | Description |
+|:------:|:---------|:------------|
+| `GET` | `/` | Interactive F1 Dashboard UI |
+| `GET` | `/tasks` | List all task definitions |
+| `GET` | `/agents` | Agent list with metadata |
+| `GET` | `/schema` | Observation/action schema |
+| `GET` | `/tasks/{task_id}/grade` | Live deterministic score for a task |
+| `POST` | `/agents/{name}/run` | Run an agent on a phase, returns telemetry |
+| `POST` | `/reset` | Reset the global environment |
+| `POST` | `/step` | Execute a single step |
+
+---
+
+## 📁 Project Structure
 
 ```text
 GP-Stratz/
-|-- app.py
-|-- inference.py
-|-- Dockerfile
-|-- openenv.yaml
-|-- pyproject.toml
-|-- requirements.txt
-`-- server/
-    |-- __init__.py
-    `-- app.py
+├── agents/                     # Strategy agents
+│   ├── __init__.py             # Agent registry & metadata
+│   ├── base_agent.py           # Abstract base class
+│   ├── easy_agent.py           # EasyRuleAgent
+│   ├── medium_agent.py         # MediumAgent
+│   ├── hard_agent.py           # HardMultiFactorAgent
+│   ├── conservative_agent.py   # ConservativeAgent
+│   └── aggressive_agent.py     # AggressiveAgent
+├── env/
+│   └── race_env.py             # Core race environment engine
+├── graders/
+│   ├── phase_grader.py         # Live deterministic episode runner
+│   └── verifier.py             # Score verification utilities
+├── frontend/
+│   └── index.html              # Frontend reference
+├── assets/                     # Screenshots & media
+│   ├── screenshot_hero.png     # Dashboard hero screenshot
+│   └── screenshot_dashboard.png # Timeline & leaderboard screenshot
+├── app.py                      # FastAPI backend + embedded Dashboard UI
+├── inference.py                # Agent evaluation via live grader pipeline
+├── inference_dry_run_check.py  # Dry-run validation
+├── Dockerfile                  # Uvicorn HF Spaces deployment
+├── openenv.yaml                # OpenEnv spec
+├── pyproject.toml
+└── requirements.txt
 ```
 
-## Local Setup
+---
 
-Install dependencies:
+## 🚀 Local Setup
+
+**Install dependencies:**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Start the server:
+**Start the server & view the Dashboard:**
 
 ```bash
 python app.py
+# Or directly with uvicorn:
+uvicorn app:app --host 0.0.0.0 --port 7860
 ```
 
-The app runs on `PORT` if provided, otherwise `7860`.
+Then navigate to `http://localhost:7860`.
 
-Run the baseline inference script:
+**Run inference evaluation:**
 
 ```bash
 export API_BASE_URL="http://your-proxy-url"
@@ -140,20 +181,27 @@ export MODEL_NAME="your-model"
 python inference.py
 ```
 
-Validate the package:
+---
 
-```bash
-openenv validate .
-openenv validate --url http://localhost:7860
-```
-
-## Docker Deployment
-
-Build and run locally:
+## 🐳 Docker Deployment
 
 ```bash
 docker build -t gp-stratz .
 docker run -p 7860:7860 gp-stratz
 ```
 
-This repository is configured as a Docker-based Hugging Face Space with `app_port: 7860`.
+---
+
+## 📜 License
+
+Apache 2.0 — see [LICENSE](LICENSE).
+
+---
+
+<div align="center">
+
+**Project JV1 — GP Stratz** | Developed by Shounak Shelke | © 2026
+
+*"This Project is inspired by a great Race Engineer & Team Principal of Williams F1 Team, James Vowles."*
+
+</div>
