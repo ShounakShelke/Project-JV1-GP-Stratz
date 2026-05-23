@@ -33,18 +33,19 @@ HTML_CONTENT = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GP-Stratz</title>
+    <title>Project JV1- GP Stratz</title>
     <style>
         :root {
-            --bg: #0B0F19;
-            --panel: #111827;
-            --panel-border: #1F2937;
-            --text: #F3F4F6;
-            --text-muted: #9CA3AF;
-            --accent-start: #6366f1;
-            --accent-end: #a855f7;
-            --success: #10B981;
-            --danger: #EF4444;
+            --bg: #111111;
+            --panel: #1a1a1a;
+            --panel-border: #333333;
+            --text: #ffffff;
+            --text-muted: #aaaaaa;
+            --accent-start: #FF1801; /* F1 Red */
+            --accent-end: #CC1301;
+            --f1-red: #FF1801;
+            --success: #00D2BE; /* Racing Green / Petronas */
+            --danger: #FF1801;
             --font: 'Inter', system-ui, -apple-system, sans-serif;
         }
 
@@ -57,6 +58,7 @@ HTML_CONTENT = """
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
 
         nav {
@@ -67,7 +69,7 @@ HTML_CONTENT = """
             padding: 15px 40px;
             box-sizing: border-box;
             border-bottom: 1px solid var(--panel-border);
-            background: rgba(11, 15, 25, 0.8);
+            background: rgba(17, 17, 17, 0.9);
             backdrop-filter: blur(10px);
         }
 
@@ -77,6 +79,16 @@ HTML_CONTENT = """
             display: flex;
             align-items: center;
             gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .logo-jv1 {
+            color: var(--f1-red);
+            font-weight: 900;
+            font-style: italic;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
         }
         
         .nav-links {
@@ -93,12 +105,13 @@ HTML_CONTENT = """
         }
         .nav-links a:hover { color: var(--text); }
         .nav-links .pill {
-            background: linear-gradient(to right, var(--accent-start), var(--accent-end));
-            color: white;
-            padding: 5px 12px;
+            background: #2a2a2a;
+            color: var(--text);
+            padding: 6px 14px;
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: bold;
+            border: 1px solid #444;
         }
 
         .hero {
@@ -110,7 +123,10 @@ HTML_CONTENT = """
         .hero h1 {
             font-size: 3.5rem;
             margin: 0 0 20px 0;
-            background: linear-gradient(to right, #e2e8f0, #94a3b8);
+            text-transform: uppercase;
+            font-weight: 900;
+            font-style: italic;
+            background: linear-gradient(to right, #ffffff, #888888);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             line-height: 1.2;
@@ -124,7 +140,8 @@ HTML_CONTENT = """
         }
         
         .hero .highlight {
-            color: var(--success);
+            color: var(--f1-red);
+            font-weight: bold;
         }
 
         .dashboard {
@@ -135,12 +152,13 @@ HTML_CONTENT = """
             max-width: 1400px;
             padding: 0 20px;
             box-sizing: border-box;
+            flex: 1;
         }
 
         .panel {
             background: var(--panel);
             border: 1px solid var(--panel-border);
-            border-radius: 12px;
+            border-radius: 8px;
             padding: 20px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
         }
@@ -151,15 +169,18 @@ HTML_CONTENT = """
             display: flex;
             align-items: center;
             gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ddd;
         }
 
         select {
             width: 100%;
-            background: #1F2937;
+            background: #222;
             color: white;
-            border: 1px solid #374151;
+            border: 1px solid #444;
             padding: 12px;
-            border-radius: 8px;
+            border-radius: 4px;
             font-size: 0.95rem;
             margin-bottom: 15px;
             outline: none;
@@ -171,9 +192,11 @@ HTML_CONTENT = """
             color: white;
             border: none;
             padding: 12px;
-            border-radius: 8px;
+            border-radius: 4px;
             font-size: 1rem;
             font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             cursor: pointer;
             transition: opacity 0.2s, transform 0.1s;
         }
@@ -192,7 +215,7 @@ HTML_CONTENT = """
             padding: 15px;
             color: #A0AEC0;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
-            border: 1px solid #1a202c;
+            border: 1px solid #333;
         }
         
         .mac-dots {
@@ -206,9 +229,9 @@ HTML_CONTENT = """
         .dot.green { background: #27C93F; }
 
         .log-entry { margin-bottom: 5px; }
-        .log-entry.pit { color: #f59e0b; }
-        .log-entry.push { color: #ef4444; }
-        .log-entry.conserve { color: #10b981; }
+        .log-entry.pit { color: #FFBD2E; }
+        .log-entry.push { color: var(--f1-red); }
+        .log-entry.conserve { color: var(--success); }
 
         /* Bottom Sections */
         .bottom-sections {
@@ -219,7 +242,7 @@ HTML_CONTENT = """
             max-width: 1400px;
             padding: 20px;
             box-sizing: border-box;
-            margin-bottom: 50px;
+            margin-bottom: 30px;
         }
 
         table {
@@ -236,22 +259,25 @@ HTML_CONTENT = """
         th {
             color: var(--text-muted);
             font-size: 0.85rem;
-            font-weight: 500;
+            font-weight: 600;
+            text-transform: uppercase;
         }
 
         .telemetry-box {
-            background: rgba(0,0,0,0.2);
+            background: #111;
             border: 1px solid var(--panel-border);
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 15px;
             text-align: center;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
         }
 
         .lap-counter {
             font-size: 4rem;
             font-weight: 900;
-            background: linear-gradient(to right, #fff, #9ca3af);
+            font-style: italic;
+            background: linear-gradient(to right, #fff, #888);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 10px;
@@ -259,7 +285,7 @@ HTML_CONTENT = """
 
         .tyre-bar-wrapper {
             width: 100%;
-            background: #1F2937;
+            background: #333;
             height: 12px;
             border-radius: 6px;
             overflow: hidden;
@@ -282,12 +308,13 @@ HTML_CONTENT = """
         .metric {
             display: flex;
             justify-content: space-between;
-            background: #1F2937;
+            background: #222;
             padding: 10px 15px;
-            border-radius: 6px;
+            border-radius: 4px;
             font-size: 0.9rem;
+            border-left: 3px solid #444;
         }
-        .metric-label { color: var(--text-muted); }
+        .metric-label { color: var(--text-muted); text-transform: uppercase; font-size: 0.8rem; }
         .metric-value { font-weight: bold; }
 
         /* Timeline bar */
@@ -320,23 +347,32 @@ HTML_CONTENT = """
             pointer-events: none;
             z-index: 10;
         }
+
+        footer {
+            width: 100%;
+            background: var(--panel);
+            border-top: 2px solid var(--f1-red);
+            padding: 30px 20px;
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: auto;
+        }
     </style>
 </head>
 <body>
     <nav>
         <div class="nav-logo">
-            <span style="color: var(--accent-start)">●</span> GP-Stratz
+            <span class="logo-jv1">JV1</span> Project JV1- GP Stratz
         </div>
         <div class="nav-links">
-            <a href="#">GitHub</a>
-            <a href="#">Paper</a>
-            <span class="pill">Meta PyTorch × Scaler 2026</span>
+            <a href="https://github.com/ShounakShelke/Project-JV1-GP-Stratz" target="_blank">GitHub</a>
+            <span class="pill">Made with ❤️ by Shounak Shelke</span>
         </div>
     </nav>
 
     <div class="hero">
         <h1>The AI That Masters F1 Strategy</h1>
-        <p>GP-Stratz trains LLM agents to declare <strong style="color:white;">calibrated confidence</strong> through adversarial tyre management. Overconfident? <span class="highlight" style="color:var(--danger)">Penalised.</span> Tactical management? <span class="highlight">Rewarded.</span></p>
+        <p>Project JV1 trains LLM agents to declare <strong style="color:white;">calibrated confidence</strong> through adversarial tyre management. Overconfident? <span class="highlight">Penalised.</span> Tactical management? <span style="color:var(--success); font-weight:bold;">Rewarded.</span></p>
         <p>The <strong>Multi-Agent Optimizer</strong> below simulates the full GP environment. Watch it unfold.</p>
     </div>
 
@@ -360,14 +396,14 @@ HTML_CONTENT = """
             </select>
 
             <button id="run-btn" class="run-btn" onclick="runEpisode()">▶ Run Episode</button>
-            <button onclick="runMatrix()" class="run-btn" style="margin-top:10px; background: #374151; color: white;">Run Full Matrix</button>
+            <button onclick="runMatrix()" class="run-btn" style="margin-top:10px; background: #333; color: white;">Run Full Matrix</button>
         </div>
 
         <div class="panel">
             <h2>Live Telemetry</h2>
             <div class="telemetry-box">
                 <div class="lap-counter">LAP <span id="lap-display">0</span>/30</div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted);">
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">
                     <span>Tyre Wear</span>
                     <span id="wear-val">0%</span>
                 </div>
@@ -390,9 +426,9 @@ HTML_CONTENT = """
                     <div class="dot red"></div>
                     <div class="dot yellow"></div>
                     <div class="dot green"></div>
-                    <span style="margin-left: 10px; font-family: var(--font); font-size: 0.8rem; color: #6B7280;">agent-trace.log</span>
+                    <span style="margin-left: 10px; font-family: var(--font); font-size: 0.8rem; color: #6B7280;">race-engineer.log</span>
                 </div>
-                <div id="log-box">Waiting for episode to start...</div>
+                <div id="log-box">Waiting for formation lap...</div>
             </div>
         </div>
     </div>
@@ -452,13 +488,18 @@ HTML_CONTENT = """
         </div>
     </div>
 
+    <footer>
+        <p style="margin: 0 0 5px 0; font-size: 0.95rem; color: #eee;"><strong>Project JV1- GP Stratz</strong> | Developed by Shounak Shelke | &copy; 2026</p>
+        <p style="margin: 0; font-style: italic;">"This Project is inspired by a great Race Engineer & Team Principal of Williams F1 Team, James Vowles."</p>
+    </footer>
+
     <script>
         const API_BASE = window.location.origin;
         const actions = {0: "PIT", 1: "STAY", 2: "CONSERVE", 3: "PUSH", 4: "SWAP"};
 
         function log(msg, cls="") {
             const b = document.getElementById("log-box");
-            if(b.textContent === "Waiting for episode to start...") b.innerHTML = "";
+            if(b.textContent === "Waiting for formation lap...") b.innerHTML = "";
             const d = document.createElement("div");
             d.className = "log-entry " + cls;
             d.textContent = msg;
@@ -530,7 +571,7 @@ HTML_CONTENT = """
                 const bar = document.getElementById("tyre-bar");
                 bar.style.width = wear + "%";
                 if(wear < 50) bar.style.background = "var(--success)";
-                else if(wear < 80) bar.style.background = "#f59e0b";
+                else if(wear < 80) bar.style.background = "#FFBD2E";
                 else bar.style.background = "var(--danger)";
 
                 let cls = "";
