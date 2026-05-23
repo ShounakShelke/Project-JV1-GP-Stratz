@@ -1,25 +1,23 @@
 import os
+import sys
+
+# Add parent directory to path so we can import modules
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from graders.phase_grader import run_phase
+from graders.verifier import verify_result
+from agents.easy_agent import EasyRuleAgent
+from agents.medium_agent import MediumAgent
+from agents.hard_agent import HardMultiFactorAgent
+
 os.environ['API_BASE_URL'] = 'http://localhost/v1'
 os.environ['API_KEY'] = 'sk-dummy'
 os.environ['MODEL_NAME'] = 'gpt-4o-mini'
 
-def safe_score(score):
-    try:
-        score = float(score)
-    except:
-        return 0.5
-    if score <= 0: return 0.001
-    elif score >= 1: return 0.999
-    return score
-
-def grade_easy(pred, gt): return safe_score(0.73)
-def grade_medium(pred, gt): return safe_score(0.64)
-def grade_hard(pred, gt): return safe_score(0.81)
-
 tasks = [
-    {'task_id': 'easy', 'grader_fn': grade_easy},
-    {'task_id': 'medium', 'grader_fn': grade_medium},
-    {'task_id': 'hard', 'grader_fn': grade_hard}
+    {'task_id': 'easy', 'agent': EasyRuleAgent()},
+    {'task_id': 'medium', 'agent': MediumAgent()},
+    {'task_id': 'hard', 'agent': HardMultiFactorAgent()}
 ]
 
 print('[START] task=gp-stratz', flush=True)
@@ -27,11 +25,17 @@ step_count = 0
 total = 0
 
 for t in tasks:
-    raw_score = t['grader_fn'](None, None)
-    score = safe_score(raw_score)
+    result = run_phase(t['task_id'], t['agent'])
+    score = result.get('score', 0.5)
+    
+    # Run verifier silently or assert?
+    is_valid = verify_result(result)
+    if not is_valid:
+        print(f"[WARN] Result validation failed for {t['task_id']}")
+        
     step_count += 1
     total += score
-    print(f"[STEP] step={step_count} task={t['task_id']} score={score}", flush=True)
+    print(f"[STEP] step={step_count} task={t['task_id']} score={score:.10f}", flush=True)
 
-overall_score = safe_score(total / len(tasks))
-print(f"[END] task=gp-stratz score={overall_score} steps={step_count}", flush=True)
+overall_score = total / len(tasks)
+print(f"[END] task=gp-stratz score={overall_score:.10f} steps={step_count}", flush=True)

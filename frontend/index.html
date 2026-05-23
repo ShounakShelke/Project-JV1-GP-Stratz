@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GP-Stratz Live Dashboard</title>
+    <style>
+        :root {
+            --bg: #0d0f12;
+            --panel: #1a1d24;
+            --accent: #e10600; /* F1 Red */
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --font: 'Inter', system-ui, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .panel {
+            background: var(--panel);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        select, button {
+            background: #2d3748;
+            color: white;
+            border: 1px solid #4a5568;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 1rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        button {
+            background: var(--accent);
+            border: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .viz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .tyre-bar-container {
+            width: 100%;
+            height: 20px;
+            background: #2d3748;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .tyre-bar {
+            height: 100%;
+            background: var(--success);
+            width: 0%;
+            transition: width 0.3s ease, background 0.3s ease;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .info-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #2d3748;
+        }
+
+        th {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .badge.pass { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .badge.fail { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+
+        .timeline-container {
+            width: 100%;
+            height: 100px;
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            margin-top: 20px;
+            border-bottom: 1px solid #4a5568;
+        }
+
+        .timeline-bar {
+            flex: 1;
+            background: var(--accent);
+            border-radius: 2px 2px 0 0;
+            transition: height 0.3s;
+            position: relative;
+        }
+
+        .timeline-bar:hover::after {
+            content: attr(data-val);
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .lap-counter {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--text);
+            text-align: center;
+            margin: 20px 0;
+            text-shadow: 0 0 10px rgba(225, 6, 0, 0.5);
+        }
+
+        .log-box {
+            height: 200px;
+            overflow-y: auto;
+            background: #000;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #a0aec0;
+        }
+
+        .log-entry { margin-bottom: 4px; }
+        .log-entry.pit { color: var(--warning); }
+        .log-entry.swap { color: #3b82f6; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>GP-Stratz Dashboard</h1>
+        <p>Live Motorsport Multi-Agent Simulation</p>
+    </div>
+
+    <div class="dashboard">
+        <!-- Left Panel: Controls & Telemetry -->
+        <div class="panel">
+            <h2>Simulation Setup</h2>
+            <div class="controls">
+                <select id="phase-select">
+                    <option value="easy">Easy (Wear & Weather)</option>
+                    <option value="medium">Medium (+ SC & Traffic)</option>
+                    <option value="hard">Hard (Multi-Factor Optimizer)</option>
+                </select>
+                <select id="agent-select">
+                    <option value="easy">EasyRuleAgent</option>
+                    <option value="medium">MediumAgent</option>
+                    <option value="hard">HardMultiFactorAgent</option>
+                    <option value="conservative">ConservativeAgent</option>
+                    <option value="aggressive">AggressiveAgent</option>
+                </select>
+                <button id="run-btn" onclick="runEpisode()">Run Episode</button>
+            </div>
+
+            <div class="viz-container">
+                <div class="lap-counter">LAP <span id="lap-display">0</span>/30</div>
+                
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span>Tyre Wear</span>
+                        <span id="wear-text">0%</span>
+                    </div>
+                    <div class="tyre-bar-container">
+                        <div class="tyre-bar" id="tyre-bar"></div>
+                    </div>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-box">
+                        <div class="info-label">Score</div>
+                        <div class="info-value" id="score-display">0.000</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">Status</div>
+                        <div class="info-value">
+                            <span class="badge" id="status-badge">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="log-box" id="log-box"></div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Analytics -->
+        <div class="panel">
+            <h2>Reward Timeline</h2>
+            <div class="timeline-container" id="timeline">
+                <!-- Bars added via JS -->
+            </div>
+
+            <h2 style="margin-top: 40px;">Leaderboard (Phase vs Agent)</h2>
+            <button onclick="runAll()" style="margin-bottom: 10px; font-size: 0.8rem; padding: 5px 10px;">Run Full Matrix</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Agent</th>
+                        <th>Easy</th>
+                        <th>Medium</th>
+                        <th>Hard</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <tr>
+                        <td>EasyRuleAgent</td>
+                        <td id="lb-easy-easy">-</td>
+                        <td id="lb-easy-medium">-</td>
+                        <td id="lb-easy-hard">-</td>
+                    </tr>
+                    <tr>
+                        <td>MediumAgent</td>
+                        <td id="lb-medium-easy">-</td>
+                        <td id="lb-medium-medium">-</td>
+                        <td id="lb-medium-hard">-</td>
+                    </tr>
+                    <tr>
+                        <td>HardMultiFactor</td>
+                        <td id="lb-hard-easy">-</td>
+                        <td id="lb-hard-medium">-</td>
+                        <td id="lb-hard-hard">-</td>
+                    </tr>
+                    <tr>
+                        <td>Conservative</td>
+                        <td id="lb-conservative-easy">-</td>
+                        <td id="lb-conservative-medium">-</td>
+                        <td id="lb-conservative-hard">-</td>
+                    </tr>
+                    <tr>
+                        <td>Aggressive</td>
+                        <td id="lb-aggressive-easy">-</td>
+                        <td id="lb-aggressive-medium">-</td>
+                        <td id="lb-aggressive-hard">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+
+        const actionNames = {0: "PIT", 1: "STAY", 2: "CONSERVE", 3: "PUSH", 4: "SWAP"};
+
+        function logMsg(msg, type="") {
+            const box = document.getElementById("log-box");
+            const div = document.createElement("div");
+            div.className = "log-entry " + type;
+            div.textContent = msg;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        async function runEpisode() {
+            const phase = document.getElementById("phase-select").value;
+            const agent = document.getElementById("agent-select").value;
+            const btn = document.getElementById("run-btn");
+            
+            btn.disabled = true;
+            btn.textContent = "Running...";
+            document.getElementById("log-box").innerHTML = "";
+            document.getElementById("timeline").innerHTML = "";
+            document.getElementById("status-badge").className = "badge";
+            document.getElementById("status-badge").textContent = "RUNNING";
+
+            logMsg(`Starting ${agent} on ${phase} phase...`);
+
+            try {
+                const res = await fetch(`${API_BASE}/agents/${agent}/run`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({task_id: phase})
+                });
+                
+                const data = await res.json();
+                
+                // Animate telemetry
+                animateRun(data.breakdown_per_lap, data.score);
+
+            } catch (e) {
+                logMsg(`Error: ${e.message}`);
+                btn.disabled = false;
+                btn.textContent = "Run Episode";
+            }
+        }
+
+        function animateRun(breakdown, finalScore) {
+            const timeline = document.getElementById("timeline");
+            const btn = document.getElementById("run-btn");
+            
+            let lapIdx = 0;
+            let currentWear = 0;
+
+            const interval = setInterval(() => {
+                if (lapIdx >= breakdown.length) {
+                    clearInterval(interval);
+                    document.getElementById("score-display").textContent = finalScore.toFixed(3);
+                    const passed = finalScore > 0.0; // Simplify threshold logic
+                    const badge = document.getElementById("status-badge");
+                    badge.textContent = passed ? "PASS" : "FAIL";
+                    badge.className = `badge ${passed ? 'pass' : 'fail'}`;
+                    
+                    btn.disabled = false;
+                    btn.textContent = "Run Episode";
+                    return;
+                }
+
+                const step = breakdown[lapIdx];
+                const actionStr = actionNames[step.action];
+                
+                // Estimate wear for viz
+                if (step.action === 0 || step.action === 4) currentWear = 0;
+                else currentWear += (step.action === 3 ? 10 : step.action === 2 ? 2.5 : 5);
+                currentWear = Math.min(100, currentWear);
+
+                document.getElementById("lap-display").textContent = step.lap;
+                document.getElementById("wear-text").textContent = Math.round(currentWear) + "%";
+                
+                const bar = document.getElementById("tyre-bar");
+                bar.style.width = currentWear + "%";
+                if (currentWear < 50) bar.style.background = "var(--success)";
+                else if (currentWear < 80) bar.style.background = "var(--warning)";
+                else bar.style.background = "var(--danger)";
+
+                let type = "";
+                if (step.action === 0) type = "pit";
+                if (step.action === 4) type = "swap";
+                
+                logMsg(`Lap ${step.lap}: Action=${actionStr} | Reward=${step.reward.toFixed(2)}`, type);
+
+                // Add timeline bar
+                const tBar = document.createElement("div");
+                tBar.className = "timeline-bar";
+                const h = Math.max(5, step.reward * 100);
+                tBar.style.height = `${h}%`;
+                if (step.reward < 0.3) tBar.style.background = "var(--danger)";
+                else if (step.reward > 0.7) tBar.style.background = "var(--success)";
+                tBar.setAttribute("data-val", step.reward.toFixed(2));
+                timeline.appendChild(tBar);
+
+                lapIdx++;
+            }, 100); // 100ms per lap animation
+        }
+
+        async function runAll() {
+            const agents = ["easy", "medium", "hard", "conservative", "aggressive"];
+            const phases = ["easy", "medium", "hard"];
+
+            for (let a of agents) {
+                for (let p of phases) {
+                    try {
+                        const cell = document.getElementById(`lb-${a}-${p}`);
+                        cell.textContent = "...";
+                        
+                        const res = await fetch(`${API_BASE}/agents/${a}/run`, {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({task_id: p})
+                        });
+                        const data = await res.json();
+                        cell.textContent = data.score.toFixed(3);
+                        cell.style.color = data.score > 0.6 ? "var(--success)" : "var(--text)";
+                    } catch(e) {
+                        console.error(e);
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

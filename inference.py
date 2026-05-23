@@ -54,12 +54,10 @@ def force_llm_call():
         return False
 
 
-TASK_SCORES = [
-    ("easy", 0.73),
-    ("medium", 0.64),
-    ("hard", 0.81),
-]
-
+from graders.phase_grader import run_phase
+from agents.easy_agent import EasyRuleAgent
+from agents.medium_agent import MediumAgent
+from agents.hard_agent import HardMultiFactorAgent
 
 if __name__ == "__main__":
     success = force_llm_call()
@@ -68,16 +66,20 @@ if __name__ == "__main__":
 
     print("[START] task=gp-stratz", flush=True)
 
-    total_score = 0.0
-    for step_number, (task_id, score) in enumerate(TASK_SCORES, start=1):
-        total_score += score
-        print(
-            f"[STEP] step={step_number} task={task_id} score={score:.2f}",
-            flush=True,
-        )
+    agents = {
+        "easy": EasyRuleAgent(),
+        "medium": MediumAgent(),
+        "hard": HardMultiFactorAgent()
+    }
 
-    average_score = total_score / len(TASK_SCORES)
-    print(
-        f"[END] task=gp-stratz score={average_score:.10f} steps={len(TASK_SCORES)}",
-        flush=True,
-    )
+    total_score = 0.0
+    step_number = 1
+    for task_id, agent in agents.items():
+        result = run_phase(task_id, agent)
+        score = result["score"]
+        total_score += score
+        print(f"[STEP] step={step_number} task={task_id} score={score:.10f}", flush=True)
+        step_number += 1
+
+    average_score = total_score / len(agents)
+    print(f"[END] task=gp-stratz score={average_score:.10f} steps={len(agents)}", flush=True)
